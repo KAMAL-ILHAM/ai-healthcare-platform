@@ -1,26 +1,51 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@theme {
+  /* Variabel Warna Premium */
+  --color-primary: #4F46E5;
+  --color-background: #F8FBFF;
+  --color-cyan: #06B6D4;
+  
+  /* Variabel Animasi */
+  --animate-float-blob: float-blob 8s ease-in-out infinite;
+  
+  @keyframes float-blob {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, -50px) scale(1.1); }
+    66% { transform: translate(-20px, 20px) scale(0.9); }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* --- CUSTOM CLASSES --- */
+
+/* Pattern kotak-kotak transparansi 40% warna biru */
+/* Pattern kotak-kotak transparansi dinaikkan agar lebih terlihat (SaaS Style) */
+.bg-pattern-grid {
+  background-image: linear-gradient(rgba(79, 70, 229, 0.15) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(79, 70, 229, 0.15) 1px, transparent 1px);
+  background-size: 48px 48px;
+  opacity: 0.4;
+}
+
+/* Ambient gradient modern ala dashboard AI */
+.bg-ambient-glow {
+  background: linear-gradient(135deg, #f0f9ff 0%, #ffffff 50%, #e0f2fe 100%);
+}
+
+.text-gradient-cyan-indigo {
+  background: linear-gradient(to right, #06B6D4, #4F46E5);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.bg-soft-depth {
+  background-image: radial-gradient(ellipse at center, #ffffff 0%, #f0f9ff 50%, #e0f2fe 100%);
+}
+
+.shadow-premium {
+  box-shadow: 0 8px 30px rgba(125, 211, 252, 0.2);
+}
+
+.shadow-glow-cyan {
+  box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
 }
