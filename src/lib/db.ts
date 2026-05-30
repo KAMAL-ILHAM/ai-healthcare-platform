@@ -1,15 +1,14 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '@prisma/client';
+console.log("DEBUG: Mencoba koneksi ke:", process.env.DATABASE_URL); // TAMBAHKAN BARIS INI
+const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
-const prismaClientSingleton = () => {
-  return new PrismaClient()
+// Kita gunakan 'export const prisma' agar cocok dengan import { prisma }
+export const prisma =
+  globalForPrisma.prisma ||
+  new PrismaClient({
+    log: ['query'],
+  });
+
+if (process.env.NODE_ENV !== 'production') {
+  globalForPrisma.prisma = prisma;
 }
-
-declare global {
-  var prismaGlobal: undefined | ReturnType<typeof prismaClientSingleton>
-}
-
-const prisma = globalThis.prismaGlobal ?? prismaClientSingleton()
-
-export default prisma
-
-if (process.env.NODE_ENV !== 'production') globalThis.prismaGlobal = prisma

@@ -1,13 +1,57 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String        @id @default(uuid())
+  email         String        @unique
+  passwordHash  String
+  createdAt     DateTime      @default(now())
+  name          String?
+  role          String        @default("patient")
+  updatedAt     DateTime?     @default(now()) @updatedAt @map("updatedAt") @db.Timestamp(6)
+  chat_sessions ChatSession[]
+
+  @@map("users")
+}
+
+
+model ChatSession {
+  id            String        @id @default(uuid())
+  title         String
+  userId        String
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime
+  isArchived    Boolean?      @default(false)
+  chat_messages ChatMessage[]
+  users         User          @relation(fields: [userId], references: [id], map: "chat_sessions_user_id_fkey")
+
+  @@map("chat_sessions")
+}
+
+
+model ChatMessage {
+  id            String       @id @default(uuid())
+  content       String
+  role          String       // <--- Pastikan ini String murni
+  sessionId     String       // <--- PINDAHKAN KE BARIS BARU DI SINI
+  createdAt     DateTime     @default(now())
+  attachments   Attachment[]
+  chat_sessions ChatSession  @relation(fields: [sessionId], references: [id])
+
+  @@map("chat_messages")
+}
+
+model Attachment {
+  id            String      @id @default(uuid())
+  file_url      String
+  message_id    String
+  chat_messages ChatMessage @relation(fields: [message_id], references: [id])
+
+  @@map("attachments")
 }
