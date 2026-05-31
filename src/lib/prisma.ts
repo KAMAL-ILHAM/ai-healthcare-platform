@@ -1,3 +1,4 @@
+import { Pool, neonConfig } from '@neondatabase/serverless';
 import { PrismaClient } from '@prisma/client';
 
 // Cache global agar Next.js tidak membuka terlalu banyak koneksi saat Anda menekan Save
@@ -12,3 +13,4 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 export default prisma;
+
