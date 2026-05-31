@@ -36,7 +36,7 @@ export default function AiShowcaseSection() {
             className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 font-satoshi tracking-tight"
           >
             Konsultasi Medis <br className="md:hidden" />
-            <span className="italic font-light text-gradient-premium">Reimagined.</span>
+            <span className="italic font-light text-gradient-cyan-indigo">Reimagined.</span>
           </motion.h2>
           
           <motion.p 

@@ -64,7 +64,7 @@ export default function TestimonialSection() {
             className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 font-satoshi tracking-tight"
           >
             Apa Kata Mereka Tentang <br />
-            <span className="italic font-light text-gradient-premium">EIOHealth.</span>
+            <span className="italic font-light text-gradient-cyan-indigo">EIOHealth.</span>
           </motion.h2>
         </div>
 

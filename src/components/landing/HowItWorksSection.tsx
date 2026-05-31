@@ -56,7 +56,7 @@ export default function HowItWorksSection() {
             initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }}
             className="text-4xl md:text-5xl font-extrabold text-gray-900 font-satoshi tracking-tight"
           >
-            Cara Kerja <span className="italic font-light text-gradient-premium">EIOHealth.</span>
+            Cara Kerja <span className="italic font-light text-gradient-cyan-indigo">EIOHealth.</span>
           </motion.h2>
         </div>
 

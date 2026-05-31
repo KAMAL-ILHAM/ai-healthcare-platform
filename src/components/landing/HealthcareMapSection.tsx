@@ -81,7 +81,7 @@ export default function HealthcareMapSection() {
             className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 font-satoshi tracking-tight"
           >
             Temukan Fasilitas Medis <br />
-            <span className="italic font-light text-gradient-premium">Dalam Hitungan Detik.</span>
+            <span className="italic font-light text-gradient-cyan-indigo">Dalam Hitungan Detik.</span>
           </motion.h2>
         </div>
 

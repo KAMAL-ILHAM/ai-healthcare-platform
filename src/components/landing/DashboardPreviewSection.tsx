@@ -33,7 +33,7 @@ export default function DashboardPreviewSection() {
             className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 font-satoshi tracking-tight"
           >
             Pusat Kendali <br />
-            <span className="italic font-light text-gradient-premium">Kesehatan Personal.</span>
+            <span className="italic font-light text-gradient-cyan-indigo">Kesehatan Personal.</span>
           </motion.h2>
         </div>
 

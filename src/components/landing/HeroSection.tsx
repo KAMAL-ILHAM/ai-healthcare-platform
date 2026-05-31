@@ -35,7 +35,7 @@ export default function HeroSection() {
 
           {/* Huge Typography */}
           <h1 className="text-6xl md:text-[6rem] font-extrabold tracking-tighter text-gray-900 mb-8 max-w-5xl leading-[1.05] font-satoshi">
-            Your <span className="italic font-light text-gradient-premium">Intelligent</span> <br />
+            Your <span className="italic font-light text-gradient-cyan-indigo">Intelligent</span> <br />
             Health Assistant.
           </h1>
 

@@ -34,8 +34,9 @@
 
 .text-gradient-cyan-indigo {
   background: linear-gradient(to right, #06B6D4, #4F46E5);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  -webkit-background-clip: text !important; /* Paksa memotong teks */
+  -webkit-text-fill-color: transparent !important; /* Paksa warna teks transparan */
+  color: transparent !important; /* Tambahan agar aman di browser non-webkit */
 }
 
 .bg-soft-depth {

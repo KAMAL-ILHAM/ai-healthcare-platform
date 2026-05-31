@@ -74,7 +74,7 @@ export default function FinalCtaSection() {
             className="text-5xl md:text-[5.5rem] font-extrabold text-gray-900 mb-8 font-satoshi tracking-tight leading-[1.1]"
           >
             Kesehatan Masa Depan <br />
-            Dalam <span className="italic font-light text-gradient-premium leading-none">Genggaman Anda.</span>
+            Dalam <span className="italic font-light text-gradient-cyan-indigo">Genggaman Anda.</span>
           </motion.h2>
 
           <motion.p 

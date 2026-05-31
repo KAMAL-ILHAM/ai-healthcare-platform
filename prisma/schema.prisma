@@ -4,22 +4,29 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model User {
-  id            String        @id @default(uuid())
-  email         String        @unique
-  passwordHash  String
-  createdAt     DateTime      @default(now())
-  name          String?
-  role          String        @default("patient")
-  updatedAt     DateTime?     @default(now()) @updatedAt @map("updatedAt") @db.Timestamp(6)
-  chat_sessions ChatSession[]
+  id                String        @id @default(uuid())
+  email             String        @unique
+  passwordHash      String
+  createdAt         DateTime      @default(now())
+  name              String?
+  role              String        @default("patient")
+  
+  // =========================================
+  // KOLOM BARU: Kunci Akses Halaman Admin
+  // =========================================
+  isStaff           Boolean       @default(false) 
+
+  updatedAt         DateTime?     @default(now()) @updatedAt @map("updatedAt") @db.Timestamp(6)
+  
+  chat_sessions     ChatSession[]
+  articles          Article[]
+  createdCategories Category[]
 
   @@map("users")
 }
-
 
 model ChatSession {
   id            String        @id @default(uuid())
@@ -34,12 +41,11 @@ model ChatSession {
   @@map("chat_sessions")
 }
 
-
 model ChatMessage {
   id            String       @id @default(uuid())
   content       String
-  role          String       // <--- Pastikan ini String murni
-  sessionId     String       // <--- PINDAHKAN KE BARIS BARU DI SINI
+  role          String       
+  sessionId     String       
   createdAt     DateTime     @default(now())
   attachments   Attachment[]
   chat_sessions ChatSession  @relation(fields: [sessionId], references: [id])
@@ -54,4 +60,47 @@ model Attachment {
   chat_messages ChatMessage @relation(fields: [message_id], references: [id])
 
   @@map("attachments")
+}
+
+// =========================================
+// MODEL BARU: KATEGORI & ARTIKEL
+// =========================================
+
+model Category {
+  id          String    @id @default(uuid())
+  name        String    @unique 
+  slug        String    @unique 
+  
+  // Relasi ke User (Admin yang membuat kategori)
+  creatorId   String
+  creator     User      @relation(fields: [creatorId], references: [id])
+  
+  // Relasi ke Artikel
+  articles    Article[] 
+  
+  createdAt   DateTime  @default(now())
+
+  @@map("categories")
+}
+
+model Article {
+  id          String    @id @default(uuid())
+  title       String
+  slug        String    @unique
+  content     String    @db.Text
+  thumbnail   String?
+  status      String    @default("DRAFT")
+  
+  // Relasi ke Kategori
+  categoryId  String
+  category    Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  
+  // Relasi ke User (Admin/Tenaga Medis yang menulis)
+  authorId    String
+  author      User      @relation(fields: [authorId], references: [id])
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("articles")
 }
