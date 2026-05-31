@@ -189,7 +189,7 @@ export default async function AdminDashboard() {
                     Artikel "{activity.title}" diperbarui
                   </h4>
                   <p className="text-xs font-medium text-gray-400 mt-1">
-                    Apoteker Kamal • {timeAgo(new Date(activity.updatedAt))}
+                    Kamal • {timeAgo(new Date(activity.updatedAt))}
                   </p>
                 </div>
               ))

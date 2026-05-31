@@ -284,7 +284,7 @@ export default function DashboardClient({ stats, latestArticles, recentActivitie
                       <div className="w-1 h-1 rounded-full bg-indigo-500 absolute top-0.5 left-0.5"></div>
                     </div>
                     <p className="text-xs font-bold text-gray-800 line-clamp-1 leading-snug group-hover:text-indigo-600 transition-colors">"{activity.title}"</p>
-                    <p className="text-[10px] font-medium text-gray-400 mt-0.5">Apoteker Kamal • {timeAgo(activity.updatedAt)}</p>
+                    <p className="text-[10px] font-medium text-gray-400 mt-0.5">{activity.authorName} • {timeAgo(activity.updatedAt)}</p>
                   </div>
                 ))
               )}
@@ -339,7 +339,7 @@ export default function DashboardClient({ stats, latestArticles, recentActivitie
                   <div key={index} className="relative pl-5 group">
                     <div className="absolute -left-[7px] top-1 w-3 h-3 rounded-full bg-indigo-100 border border-white flex items-center justify-center"><div className="w-1.5 h-1.5 rounded-full bg-indigo-500"></div></div>
                     <p className="text-sm font-bold text-gray-900 leading-snug">{activity.title}</p>
-                    <p className="text-xs font-semibold text-gray-400 mt-1">Apoteker Kamal • {new Date(activity.updatedAt).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })}</p>
+                    <p className="text-xs font-light text-gray-400 mt-1">{activity.authorName} • {new Date(activity.updatedAt).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })}</p>
                   </div>
                 ))}
               </div>
