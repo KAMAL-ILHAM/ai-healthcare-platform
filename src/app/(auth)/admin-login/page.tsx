@@ -32,7 +32,7 @@ export default function AdminLoginPage() {
       }
 
       console.log("Login sukses:", data.message);
-      router.push('/dashboard/admin'); 
+      router.push('/admin');
 
     } catch (error) {
       setErrorMessage('Terjadi kesalahan jaringan. Periksa koneksi Anda dan coba lagi.');

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/layout/Navbar"; // Menggunakan alias @/ agar pasti terbaca
+import NavbarWrapper from "@/components/layout/NavbarWrapper"; 
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
@@ -10,15 +10,12 @@ export const metadata: Metadata = {
   description: "Platform kesehatan masa depan.",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="id">
       <body className={`${inter.variable} font-sans antialiased bg-background text-gray-900`}>
-        <Navbar /> 
+        {/* HANYA INI YANG BOLEH ADA DI SINI */}
+        <NavbarWrapper /> 
         {children}
       </body>
     </html>

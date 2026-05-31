@@ -35,7 +35,7 @@ const steps = [
 
 export default function HowItWorksSection() {
   return (
-    <section className="py-12 bg-[#FAFCFF] relative overflow-hidden z-10">
+    <section id="how-it-works" className="py-12 bg-[#FAFCFF] relative overflow-hidden z-10">
       
       {/* Background Ambience */}
       <div className="absolute top-0 left-0 w-full h-full bg-pattern-grid opacity-40 pointer-events-none" />

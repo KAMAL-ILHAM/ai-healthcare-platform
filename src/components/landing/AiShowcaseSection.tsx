@@ -5,7 +5,7 @@ import { Bot, Sparkles, Activity, AlertTriangle, Stethoscope, MapPin, ChevronRig
 
 export default function AiShowcaseSection() {
   return (
-    <section className="py-16 bg-[#FAFCFF] relative overflow-hidden z-10">
+    <section id="ai-health" className="py-16 bg-[#FAFCFF] relative overflow-hidden z-10">
       
       {/* Background Soft Glow & Blur */}
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/10 to-transparent" />

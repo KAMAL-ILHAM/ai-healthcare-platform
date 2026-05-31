@@ -1,5 +1,4 @@
-import { prisma } from '@/lib/db';
-
+import prisma from '@/lib/prisma'; // <-- Kembali ke import standar (tanpa kurung kurawal)
 export class ChatService {
   
   // 1. Mengambil semua riwayat sesi chat milik satu user (untuk Sidebar)

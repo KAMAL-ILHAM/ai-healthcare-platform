@@ -1,25 +1,43 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
+// Import langsung dari folder dashboard di bawahnya
+import Sidebar from './dashboard/Sidebar'; 
+import Header from './dashboard/Header';
 
-export default function ConditionalLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function ConditionalLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
-  // Cek apakah user sedang berada di halaman login atau register
-  const isAuthPage = 
-  pathname.startsWith('/login') ||
-  pathname.startsWith('/register') ||
-  pathname.startsWith('/dashboard');
+  // 1. Deteksi Halaman Admin
+  const isAdminPage = pathname.startsWith('/admin');
+  
+  // 2. Deteksi Halaman Auth (Login/Register)
+  const isAuthPage = pathname.startsWith('/login') || pathname.startsWith('/register');
 
-  // Jika di halaman auth, JANGAN render apa pun (return null)
-  if (isAuthPage) {
-    return null;
+  // 3. Deteksi Landing Page
+  const isLandingPage = pathname === '/';
+
+  // ==========================================
+  // JIKA DI HALAMAN ADMIN, AUTH, ATAU LANDING PAGE
+  // Jangan render Sidebar & Header sama sekali!
+  // ==========================================
+  if (isAdminPage || isAuthPage || isLandingPage) {
+    return <>{children}</>; 
   }
 
-  // Jika di halaman lain (seperti landing page / dashboard), render elemennya
-  return <>{children}</>;
+  // ==========================================
+  // JIKA DI HALAMAN DASHBOARD UTAMA
+  // Tampilkan antarmuka Pharmacist dengan rapi
+  // ==========================================
+  return (
+    <div className="flex h-screen bg-[#FBFBFD] overflow-hidden">
+      <Sidebar />
+      <div className="flex flex-col flex-1 overflow-hidden">
+        <Header />
+        <main className="flex-1 overflow-y-auto p-4 md:p-8">
+          {children}
+        </main>
+      </div>
+    </div>
+  );
 }

@@ -61,7 +61,7 @@ export default function HealthcareMapSection() {
   );
 
   return (
-    <section className="py-12 bg-[#FAFCFF] relative overflow-hidden z-10">
+    <section id="location" className="py-12 bg-[#FAFCFF] relative overflow-hidden z-10">
       <div className="container mx-auto px-6 max-w-7xl relative z-10">
         
         {/* SECTION HEADER */}

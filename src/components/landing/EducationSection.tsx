@@ -37,7 +37,7 @@ export default function EducationSection() {
   const [activeCategory, setActiveCategory] = useState("Terbaru");
 
   return (
-    <section className="py-16 bg-white relative overflow-hidden z-8">
+    <section id="education" className="py-16 bg-white relative overflow-hidden z-8">
       <div className="container mx-auto px-6 max-w-7xl relative z-10">
         
         {/* SECTION HEADER & TABS */}

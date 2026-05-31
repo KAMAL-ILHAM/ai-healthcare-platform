@@ -63,7 +63,7 @@ const features = [
 
 export default function FeatureSection() {
   return (
-    <section className="relative py-32 overflow-hidden bg-ambient-glow bg-soft-depth">
+    <section id="layanan" className="relative py-32 overflow-hidden bg-ambient-glow bg-soft-depth">
       
       {/* 1. Grid Pattern (Sama dengan Hero) */}
       <div className="absolute inset-0 bg-pattern-grid pointer-events-none" />

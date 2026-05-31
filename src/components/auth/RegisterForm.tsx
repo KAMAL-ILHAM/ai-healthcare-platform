@@ -59,7 +59,7 @@ export default function RegisterForm() {
       transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
       className="w-full max-w-[420px]"
     >
-      <div className="bg-[rgba(255,255,255,0.65)] backdrop-blur-xl border border-white/60 p-8 sm:p-10 rounded-[32px] shadow-[0_8px_32px_rgba(0,0,0,0.04)] hover:shadow-[0_16px_48px_rgba(6,182,212,0.1)] transition-shadow duration-500">
+      <div  className="bg-[rgba(255,255,255,0.65)] backdrop-blur-xl border border-white/60 p-8 sm:p-10 rounded-[32px] shadow-[0_8px_32px_rgba(0,0,0,0.04)] hover:shadow-[0_16px_48px_rgba(6,182,212,0.1)] transition-shadow duration-500">
         
         <div className="text-center mb-6">
           <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Create Account</h2>

@@ -22,7 +22,7 @@ import {
 } from '@/app/services/ai.service';
 import { ChatService } from '@/app/services/chat.service';
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import prisma from '@/lib/prisma'; // <-- Kembali ke import standar (tanpa kurung kurawal)
 
 export const maxDuration = 60;
 

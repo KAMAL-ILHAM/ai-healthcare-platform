@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, Search, Users, BookOpen, Stethoscope } from 'lucide-react';
+import { CircleQuestionMark } from 'lucide-react';
+
 
 const faqs = [
   {
@@ -60,14 +62,20 @@ export default function FaqSection() {
   };
 
   return (
-    <section className="py-2 bg-white relative z-10">
-      <div className="container mx-auto px-6 max-w-6xl relative z-10">
+    <section className="py-1 bg-white relative z-4">
+      <div className="container mx-auto px-3 max-w-6xl relative z-10">
         
         {/* TOP SECTION: BIG SEARCH HEADER (Sesuai Referensi) */}
         <div className="relative w-full rounded-[3rem] bg-gradient-to-b from-[#FAFCFF] to-transparent border border-gray-100 px-6 py-16 md:py-24 text-center mb-16 overflow-hidden">
           {/* Subtle Ambient Background */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-2xl h-[200px] bg-primary/5 rounded-full blur-[80px] pointer-events-none" />
-          
+          <motion.div 
+              initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-50 border border-gray-100 shadow-sm mb-4"
+            >
+              <CircleQuestionMark className="w-4 h-4 text-primary" />
+              <span className="text-sm font-bold text-gray-800 tracking-wide font-satoshi uppercase">FAQ</span>
+            </motion.div>
           <motion.h2 
             initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
             className="text-4xl md:text-[3.5rem] font-extrabold text-gray-900 mb-10 font-satoshi tracking-tight"

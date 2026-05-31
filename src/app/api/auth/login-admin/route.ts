@@ -1,15 +1,19 @@
 import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
+import prisma from '@/lib/prisma'; // <-- Kembali ke import standar (tanpa kurung kurawal)
 import bcrypt from 'bcryptjs';
 import { SignJWT } from 'jose';
 
 export async function POST(req: Request) {
   try {
+    // Baris 'const prisma = getPrisma();' sudah Dihapus karena tidak diperlukan lagi
+    
     const { email, password } = await req.json();
 
     // 1. Cari user di database berdasarkan email
     const user = await prisma.user.findUnique({
-      where: { email: email }
+      where: { 
+        email: email 
+      }
     });
 
     // 2. Validasi: Apakah user ada? Dan apakah dia memiliki akses isStaff?
@@ -39,10 +43,10 @@ export async function POST(req: Request) {
     })
       .setProtectedHeader({ alg: 'HS256' })
       .setIssuedAt()
-      .setExpirationTime('8h') // Sesi admin akan otomatis kedaluwarsa dalam 8 jam
+      .setExpirationTime('8h') // Sesi admin otomatis kedaluwarsa dalam 8 jam
       .sign(secretKey);
 
-    // 5. Buat response sukses dan tanamkan token ke dalam Cookie Browser
+    // 5. Buat response sukses dan tanamkan token ke Cookie Browser
     const response = NextResponse.json(
       { message: 'Autentikasi Sistem Berhasil' },
       { status: 200 }
@@ -51,7 +55,7 @@ export async function POST(req: Request) {
     response.cookies.set({
       name: 'admin_session', // Nama cookie
       value: token,
-      httpOnly: true, // Sangat aman, tidak bisa dicuri oleh script peretas
+      httpOnly: true, // Sangat aman, tidak bisa dicuri script peretas
       path: '/',
       secure: process.env.NODE_ENV === 'production',
       maxAge: 60 * 60 * 8, // 8 jam dalam detik

@@ -5,7 +5,7 @@ import { ArrowRight, Sparkles, ShieldCheck, MapPin, Bot, Activity, LineChart, He
 
 export default function HeroSection() {
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-start pt-32 md:pt-40 overflow-hidden bg-[#FAFCFF]">
+    <section id="hero" className="relative min-h-screen flex flex-col items-center justify-start pt-32 md:pt-40 overflow-hidden bg-[#FAFCFF]">
       
       {/* 1. Cinematic Background Elements */}
       <div className="absolute inset-0 bg-pattern-grid pointer-events-none opacity-60" />

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/db'; // Menggunakan db.ts yang benar
+import prisma from '@/lib/prisma';
 import bcrypt from 'bcrypt';
 import { signToken } from '@/lib/utils/auth'; // Memanggil fungsi pembuat token rahasia kita
 
