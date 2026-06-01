@@ -3,11 +3,10 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  LayoutDashboard, Sparkles, MapPin, BookOpen, History, 
-  Bookmark, LogOut, Settings, Activity 
+  LayoutDashboard, Sparkles, MapPin, BookOpen, 
+  Settings, Activity 
 } from 'lucide-react';
 import Link from 'next/link';
-// 1. Tambahkan import useRouter di sini
 import { usePathname, useRouter } from 'next/navigation'; 
 
 const sidebarMenus = [
@@ -15,16 +14,17 @@ const sidebarMenus = [
   { icon: Sparkles, label: 'AI Chat', href: '/dashboard/chat' },
   { icon: MapPin, label: 'Fasilitas Medis', href: '/dashboard/facilities' },
   { icon: BookOpen, label: 'Edukasi', href: '/dashboard/education' },
-  
 ];
 
 export default function Sidebar() {
   const [isSidebarHovered, setIsSidebarHovered] = useState(false);
   const pathname = usePathname();
-  // 2. Inisialisasi router
   const router = useRouter(); 
 
-  // 3. Tambahkan fungsi handleLogout di sini
+  // 🌟 KUNCI RAHASIA: Jika sedang di halaman detail artikel, jangan tampilkan Sidebar
+  const isReadingArticle = pathname.startsWith('/dashboard/education/') && pathname !== '/dashboard/education';
+  if (isReadingArticle) return null;
+
   const handleLogout = async () => {
     try {
       const response = await fetch('/api/auth/logout', {
@@ -33,7 +33,6 @@ export default function Sidebar() {
       });
 
       if (response.ok) {
-        // Hancurkan cache rute Next.js dan lempar ke halaman login
         router.push('/login');
         router.refresh();
       }

@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { 
   User, Shield, Bell, SlidersHorizontal, Lock, 
-  Monitor, Languages, PlugZap, Smartphone, LogOut,
-  Camera, CheckCircle2, AlertTriangle, ArrowRight
+  Monitor, PlugZap, Smartphone, LogOut,
+  Camera, CheckCircle2, AlertTriangle, ArrowRight, Loader2
 } from 'lucide-react';
 
 // --- DATA MENU SETTINGS ---
@@ -25,13 +25,12 @@ export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState('profile');
   const router = useRouter();
 
-  // --- FUNGSI LOGOUT ---
   const handleLogout = async () => {
     try {
       const response = await fetch('/api/auth/logout', { method: 'POST' });
       if (response.ok) {
         router.push('/login');
-        router.refresh(); // Memaksa pembersihan cache halaman
+        router.refresh();
       }
     } catch (error) {
       console.error("Gagal melakukan logout:", error);
@@ -42,7 +41,7 @@ export default function SettingsPage() {
     <div className="max-w-7xl mx-auto">
       <div className="flex flex-col lg:flex-row gap-8">
         
-        {/* --- INNER SIDEBAR (NAVIGASI SETTINGS) --- */}
+        {/* --- INNER SIDEBAR --- */}
         <motion.nav 
           initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}
           className="w-full lg:w-72 shrink-0 flex flex-col gap-1.5"
@@ -71,7 +70,6 @@ export default function SettingsPage() {
           
           <div className="h-px bg-gray-200/60 my-4 w-full" />
           
-          {/* --- TOMBOL LOGOUT TERINTEGRASI --- */}
           <button 
             onClick={handleLogout}
             className="flex items-center gap-3 px-4 py-3.5 rounded-2xl text-sm font-semibold text-rose-500 hover:bg-rose-50/50 hover:text-rose-600 transition-all w-full text-left"
@@ -81,7 +79,7 @@ export default function SettingsPage() {
           </button>
         </motion.nav>
 
-        {/* --- KONTEN SETTINGS (DENGAN ANIMASI TRANSISI) --- */}
+        {/* --- KONTEN SETTINGS --- */}
         <div className="flex-1 min-w-0">
           <AnimatePresence mode="wait">
             <motion.div
@@ -95,9 +93,9 @@ export default function SettingsPage() {
               {activeTab === 'security' && <SecuritySettings />}
               {activeTab === 'notifications' && <NotificationSettings />}
               {activeTab === 'appearance' && <AppearanceSettings />}
-              {/* Fallback untuk tab lain agar desain tetap tidak rusak */}
+              
               {!['profile', 'security', 'notifications', 'appearance'].includes(activeTab) && (
-                <div className="bg-white/60 backdrop-blur-xl border border-white/80 p-12 rounded-[32px] flex flex-col items-center justify-center text-center shadow-sm">
+                <div className="bg-white/60 backdrop-blur-xl border border-white/80 p-12 rounded-[32px] flex flex-col items-center justify-center text-center shadow-sm max-w-2xl min-h-[400px]">
                   <PlugZap className="w-12 h-12 text-gray-300 mb-4" />
                   <h3 className="text-xl font-bold text-gray-900">Modul Segera Hadir</h3>
                   <p className="text-gray-500 mt-2 max-w-sm">Pengaturan untuk modul ini sedang dalam tahap pengembangan iterasi berikutnya.</p>
@@ -113,19 +111,145 @@ export default function SettingsPage() {
 }
 
 // ============================================================================
-// KOMPONEN-KOMPONEN TAB
+// KOMPONEN PROFIL (TERINTEGRASI DATABASE & VALIDASI KETAT)
 // ============================================================================
 
 function ProfileSettings() {
+  const router = useRouter();
+  const [formData, setFormData] = useState({ name: '', email: '' });
+  const [originalData, setOriginalData] = useState({ name: '', email: '' });
+  
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [userExists, setUserExists] = useState(true); // 🌟 Status deteksi akun
+  const [message, setMessage] = useState({ type: '', text: '' });
+
+  // 1. Tarik Data Murni dari API (Tanpa Dummy Data)
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await fetch('/api/settings/profile');
+        
+        // 🌟 Jika backend menolak (401) atau user tidak ada (404)
+        if (res.status === 404 || res.status === 401) {
+          setUserExists(false);
+          setIsLoading(false);
+          return;
+        }
+
+        if (res.ok) {
+          const data = await res.json();
+          const loadedData = {
+            name: data.name || '',
+            email: data.email || ''
+          };
+          setFormData(loadedData);
+          setOriginalData(loadedData);
+        } else {
+          throw new Error('Respons tidak dikenali');
+        }
+      } catch (error) {
+        console.error("Gagal mengambil data profil", error);
+        setMessage({ type: 'error', text: 'Koneksi ke server gagal. Periksa jaringan Anda.' });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchProfile();
+  }, []);
+
+  // 2. Fungsi Validasi Form (Maks 60 Karakter & Regex Email)
+  const validateForm = () => {
+    const { name, email } = formData;
+    
+    if (!name.trim()) return "Nama lengkap tidak boleh kosong.";
+    if (name.length > 60) return "Nama lengkap maksimal 60 karakter.";
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email.trim()) return "Email publik tidak boleh kosong.";
+    if (!emailRegex.test(email)) return "Format email tidak valid.";
+
+    return null;
+  };
+
+  // 3. Fungsi Simpan (Aman & Sesuai Sesi)
+  const handleSave = async () => {
+    setMessage({ type: '', text: '' }); 
+    const validationError = validateForm();
+    if (validationError) {
+      setMessage({ type: 'error', text: validationError });
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const res = await fetch('/api/settings/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name.trim(),
+          email: formData.email.trim()
+        })
+      });
+      
+      const responseData = await res.json();
+
+      if (res.ok) {
+        setOriginalData(formData);
+        setMessage({ type: 'success', text: 'Profil berhasil diperbarui!' });
+        router.refresh(); // Update Header & antarmuka global real-time
+        setTimeout(() => setMessage({ type: '', text: '' }), 3000);
+      } else {
+        setMessage({ type: 'error', text: responseData.error || 'Terjadi kesalahan sistem.' });
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: 'Gagal menyimpan perubahan. Silakan coba lagi.' });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const isChanged = formData.name !== originalData.name || formData.email !== originalData.email;
+
+  // 🌟 TAMPILAN LOADING
+  if (isLoading) {
+    return (
+      <div className="max-w-2xl bg-white/60 backdrop-blur-xl border border-white/80 p-12 rounded-[32px] flex items-center justify-center min-h-[400px]">
+        <Loader2 className="w-10 h-10 text-cyan-500 animate-spin" />
+      </div>
+    );
+  }
+
+  // 🌟 TAMPILAN AKUN TIDAK DITEMUKAN (Diblokir)
+  if (!userExists) {
+    return (
+      <div className="max-w-2xl bg-white/80 backdrop-blur-xl border border-rose-100 p-12 rounded-[32px] shadow-[0_8px_32px_rgba(0,0,0,0.03)] flex flex-col items-center justify-center text-center min-h-[400px]">
+        <div className="w-20 h-20 bg-rose-50 rounded-full flex items-center justify-center mb-6">
+          <AlertTriangle className="w-10 h-10 text-rose-500" />
+        </div>
+        <h2 className="text-2xl font-black text-slate-900 mb-3">Akun Tidak Ditemukan</h2>
+        <p className="text-slate-500 mb-8 max-w-md">Data sesi Anda tidak terdaftar di dalam database EIOHealth. Akses untuk mengubah profil ditolak demi keamanan.</p>
+        <button 
+          onClick={() => router.push('/login')} 
+          className="px-8 py-3 bg-slate-900 text-white rounded-full font-bold hover:bg-slate-800 transition-colors shadow-lg shadow-slate-900/20"
+        >
+          Kembali ke Halaman Login
+        </button>
+      </div>
+    );
+  }
+
+  // 🌟 TAMPILAN FORM NORMAL
   return (
-    <div className="space-y-6">
-      {/* KARTU PROFIL HEADER */}
+    <div className="space-y-6 max-w-2xl">
       <div className="bg-white/60 backdrop-blur-xl border border-white/80 p-8 rounded-[32px] shadow-[0_8px_32px_rgba(0,0,0,0.03)] flex flex-col sm:flex-row items-center gap-8 relative overflow-hidden">
         <div className="absolute -top-20 -right-20 w-40 h-40 bg-cyan-400/20 blur-3xl rounded-full pointer-events-none" />
         
-        <div className="relative group cursor-pointer">
-          <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-cyan-100 to-indigo-100 border-4 border-white shadow-xl flex items-center justify-center overflow-hidden">
-            <User className="w-10 h-10 text-indigo-400" />
+        <div className="relative group cursor-pointer shrink-0">
+          <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-cyan-100 to-indigo-100 border-4 border-white shadow-lg flex items-center justify-center overflow-hidden">
+            <span className="text-2xl font-black text-indigo-400">
+              {formData.name ? formData.name.substring(0, 2).toUpperCase() : 'UI'}
+            </span>
           </div>
           <div className="absolute inset-0 bg-gray-900/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm">
             <Camera className="w-6 h-6 text-white" />
@@ -134,41 +258,84 @@ function ProfileSettings() {
         
         <div className="flex-1 text-center sm:text-left z-10">
           <div className="flex items-center justify-center sm:justify-start gap-2 mb-1">
-            <h2 className="text-2xl font-bold text-gray-900">Kamal Ilham</h2>
+            <h2 className="text-2xl font-bold text-gray-900">{originalData.name || 'Pengguna'}</h2>
             <CheckCircle2 className="w-5 h-5 text-cyan-500" />
           </div>
-          <p className="text-indigo-600 font-semibold text-sm mb-3">Verified Pharmacist • EIOHealth Pro</p>
-          <p className="text-gray-500 text-sm max-w-md">Format gambar yang didukung: JPG, PNG, atau GIF. Ukuran maksimal 2MB.</p>
+          <p className="text-indigo-600 font-semibold text-sm mb-3">EIOHealth User</p>
+          <p className="text-gray-500 text-sm">Ketuk foto untuk memperbarui avatar Anda.</p>
         </div>
       </div>
 
-      {/* FORM INFORMASI PERSONAL */}
       <div className="bg-white/60 backdrop-blur-xl border border-white/80 p-8 rounded-[32px] shadow-[0_8px_32px_rgba(0,0,0,0.03)]">
         <h3 className="text-lg font-bold text-gray-900 mb-6">Informasi Personal</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <InputGroup label="Nama Lengkap" placeholder="Kamal Ilham" />
-          <InputGroup label="Email Publik" placeholder="pharmacist@eiohealth.com" />
-          <InputGroup label="Nomor Telepon" placeholder="+62 812 3456 7890" />
-          <InputGroup label="Lokasi Praktik/Instansi" placeholder="Universitas Muhammadiyah Kalimantan Timur" />
-          <div className="md:col-span-2">
-            <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2 ml-1">Bio Singkat</label>
-            <textarea 
-              rows={3} placeholder="Tuliskan spesialisasi atau deskripsi singkat Anda..."
-              className="w-full px-4 py-3 bg-white/40 border border-white/60 rounded-xl text-sm focus:outline-none focus:bg-white/80 focus:ring-4 focus:ring-cyan-500/10 focus:border-cyan-500 transition-all placeholder:text-gray-400 text-gray-900 font-medium shadow-sm resize-none"
-            />
-          </div>
+        
+        <div className="space-y-5">
+          <InputGroup 
+            label="Nama Lengkap" 
+            placeholder="Masukkan nama lengkap Anda" 
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          />
+          <InputGroup 
+            label="Email Publik" 
+            type="email"
+            placeholder="email@domain.com" 
+            value={formData.email}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          />
         </div>
+
+        <AnimatePresence>
+          {message.text && (
+            <motion.div 
+              initial={{ opacity: 0, height: 0, marginTop: 0 }} 
+              animate={{ opacity: 1, height: 'auto', marginTop: 16 }} 
+              exit={{ opacity: 0, height: 0, marginTop: 0 }}
+              className={`p-3 rounded-xl text-sm font-bold flex items-center gap-2 ${
+                message.type === 'error' ? 'bg-rose-50 text-rose-600 border border-rose-100' : 'bg-emerald-50 text-emerald-600 border border-emerald-100'
+              }`}
+            >
+              {message.type === 'error' ? <AlertTriangle className="w-4 h-4 shrink-0" /> : <CheckCircle2 className="w-4 h-4 shrink-0" />}
+              {message.text}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <div className="mt-8 flex justify-end">
-          <ButtonPrimary>Simpan Perubahan</ButtonPrimary>
+          <button 
+            onClick={handleSave}
+            disabled={!isChanged || isSaving}
+            className={`group relative px-6 py-3 rounded-xl text-white text-sm font-bold flex items-center gap-2 transition-all duration-300 ${
+              !isChanged || isSaving 
+                ? 'bg-gray-300 cursor-not-allowed opacity-70' 
+                : 'bg-gradient-to-r from-indigo-600 to-cyan-500 hover:scale-[1.02] hover:shadow-[0_8px_24px_rgba(6,182,212,0.3)] active:scale-[0.98]'
+            }`}
+          >
+            {isSaving ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Menyimpan...
+              </>
+            ) : (
+              <>
+                Simpan Perubahan
+                <ArrowRight className={`w-4 h-4 transition-transform ${isChanged ? 'group-hover:translate-x-1' : ''}`} />
+              </>
+            )}
+          </button>
         </div>
       </div>
     </div>
   );
 }
 
+// ============================================================================
+// KOMPONEN LAINNYA 
+// ============================================================================
+
 function SecuritySettings() {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-2xl">
       <div className="bg-white/60 backdrop-blur-xl border border-white/80 p-8 rounded-[32px] shadow-[0_8px_32px_rgba(0,0,0,0.03)]">
         <div className="flex items-start gap-4 mb-8">
           <div className="p-3 bg-emerald-50 rounded-2xl text-emerald-600">
@@ -179,15 +346,12 @@ function SecuritySettings() {
             <p className="text-gray-500 text-sm mt-1">Akun Anda dilindungi dengan enkripsi level medis. Disarankan untuk mengaktifkan 2FA.</p>
           </div>
         </div>
-
         <h4 className="text-sm font-bold text-gray-900 mb-4">Ubah Kata Sandi</h4>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 gap-5 mb-8">
           <InputGroup type="password" label="Kata Sandi Saat Ini" placeholder="••••••••" />
           <InputGroup type="password" label="Kata Sandi Baru" placeholder="Min. 8 karakter" />
         </div>
-
         <div className="h-px bg-gray-200/60 w-full mb-8" />
-
         <div className="flex items-center justify-between mb-2">
           <div>
             <h4 className="text-sm font-bold text-gray-900">Autentikasi Dua Faktor (2FA)</h4>
@@ -196,8 +360,6 @@ function SecuritySettings() {
           <ToggleSwitch isActive={false} />
         </div>
       </div>
-
-      {/* DANGER ZONE */}
       <div className="bg-rose-50/50 backdrop-blur-xl border border-rose-100/50 p-8 rounded-[32px]">
         <div className="flex items-start gap-4">
           <div className="p-3 bg-rose-100/50 rounded-2xl text-rose-600">
@@ -218,11 +380,10 @@ function SecuritySettings() {
 
 function NotificationSettings() {
   return (
-    <div className="bg-white/60 backdrop-blur-xl border border-white/80 p-8 rounded-[32px] shadow-[0_8px_32px_rgba(0,0,0,0.03)] space-y-8">
+    <div className="bg-white/60 backdrop-blur-xl border border-white/80 p-8 rounded-[32px] shadow-[0_8px_32px_rgba(0,0,0,0.03)] space-y-8 max-w-2xl">
       <div>
         <h3 className="text-lg font-bold text-gray-900 mb-1">Notifikasi Sistem</h3>
         <p className="text-sm text-gray-500 mb-6">Atur bagaimana EIOHealth berkomunikasi dengan Anda.</p>
-        
         <div className="space-y-6">
           <ToggleRow title="Pengingat Konsultasi AI" desc="Dapatkan notifikasi untuk jadwal konsultasi dan hasil analisis." active={true} />
           <ToggleRow title="Rekomendasi Artikel Edukasi" desc="Artikel kesehatan terbaru berdasarkan minat Anda." active={false} />
@@ -230,7 +391,9 @@ function NotificationSettings() {
         </div>
       </div>
       <div className="flex justify-end">
-        <ButtonPrimary>Simpan Preferensi</ButtonPrimary>
+        <button className="group relative px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-500 text-white text-sm font-bold flex items-center gap-2 transition-all hover:scale-[1.02]">
+          Simpan Preferensi
+        </button>
       </div>
     </div>
   );
@@ -238,12 +401,10 @@ function NotificationSettings() {
 
 function AppearanceSettings() {
   return (
-    <div className="bg-white/60 backdrop-blur-xl border border-white/80 p-8 rounded-[32px] shadow-[0_8px_32px_rgba(0,0,0,0.03)]">
+    <div className="bg-white/60 backdrop-blur-xl border border-white/80 p-8 rounded-[32px] shadow-[0_8px_32px_rgba(0,0,0,0.03)] max-w-2xl">
       <h3 className="text-lg font-bold text-gray-900 mb-1">Tema Aplikasi</h3>
       <p className="text-sm text-gray-500 mb-6">Pilih mode tampilan yang paling nyaman untuk mata Anda.</p>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Mockup Light Mode */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="border-2 border-indigo-500 rounded-2xl p-4 cursor-pointer bg-gray-50 relative overflow-hidden group">
           <div className="absolute top-2 right-2 w-5 h-5 bg-indigo-500 rounded-full flex items-center justify-center">
             <CheckCircle2 className="w-3 h-3 text-white" />
@@ -254,8 +415,6 @@ function AppearanceSettings() {
           </div>
           <p className="text-center font-bold text-sm text-gray-900">Light Mode</p>
         </div>
-
-        {/* Mockup Dark Mode */}
         <div className="border border-gray-200 hover:border-gray-300 rounded-2xl p-4 cursor-pointer bg-gray-900 relative overflow-hidden transition-colors">
           <div className="w-full h-24 bg-gray-800 rounded-xl shadow-sm border border-gray-700 mb-3 flex flex-col p-2 gap-2">
             <div className="w-full h-4 bg-gray-700 rounded-md" />
@@ -263,13 +422,11 @@ function AppearanceSettings() {
           </div>
           <p className="text-center font-bold text-sm text-white">Dark Mode</p>
         </div>
-
-        {/* Mockup System Mode */}
         <div className="border border-gray-200 hover:border-gray-300 rounded-2xl p-4 cursor-pointer bg-gradient-to-br from-gray-50 to-gray-900 relative overflow-hidden transition-colors">
           <div className="w-full h-24 bg-white/50 backdrop-blur-md rounded-xl shadow-sm border border-gray-300/50 mb-3 flex items-center justify-center">
             <Monitor className="w-8 h-8 text-gray-400" />
           </div>
-          <p className="text-center font-bold text-sm text-gray-900 bg-white/80 rounded-full py-0.5 mt-1 backdrop-blur-sm">System Sync</p>
+          <p className="text-center font-bold text-sm text-gray-900 bg-white/80 rounded-full py-0.5 mt-1 backdrop-blur-sm">System</p>
         </div>
       </div>
     </div>
@@ -277,15 +434,18 @@ function AppearanceSettings() {
 }
 
 // ============================================================================
-// MICRO-COMPONENTS (Alat bantu UI kecil)
+// MICRO-COMPONENTS
 // ============================================================================
 
-function InputGroup({ label, placeholder, type = "text" }: { label: string, placeholder: string, type?: string }) {
+function InputGroup({ label, placeholder, type = "text", value, onChange }: { label: string, placeholder: string, type?: string, value?: string, onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void }) {
   return (
     <div>
       <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2 ml-1">{label}</label>
       <input
-        type={type} placeholder={placeholder}
+        type={type} 
+        placeholder={placeholder}
+        value={value !== undefined ? value : undefined}
+        onChange={onChange}
         className="w-full px-4 py-3.5 bg-white/40 border border-white/60 rounded-xl text-sm focus:outline-none focus:bg-white/80 focus:ring-4 focus:ring-cyan-500/10 focus:border-cyan-500 transition-all placeholder:text-gray-400 text-gray-900 font-medium shadow-sm"
       />
     </div>
@@ -317,15 +477,6 @@ function ToggleSwitch({ isActive, onClick }: { isActive: boolean, onClick?: () =
         animate={{ x: isActive ? 20 : 0 }}
         transition={{ type: "spring", stiffness: 500, damping: 30 }}
       />
-    </button>
-  );
-}
-
-function ButtonPrimary({ children }: { children: React.ReactNode }) {
-  return (
-    <button className="group relative px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-500 text-white text-sm font-bold flex items-center gap-2 transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_8px_24px_rgba(6,182,212,0.3)] active:scale-[0.98]">
-      {children}
-      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
     </button>
   );
 }

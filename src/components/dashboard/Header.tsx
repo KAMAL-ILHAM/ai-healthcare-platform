@@ -1,31 +1,35 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bell, User, Phone } from 'lucide-react'; // Hapus import Search, tambahkan Phone
+import { Bell, User, Phone } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
-export default function Header() {
+// 🌟 PERBAIKAN: Menambahkan { userName } sebagai props
+export default function Header({ userName = "Pengguna" }: { userName?: string }) {
   const pathname = usePathname();
 
-  // Logika presisi untuk mendeteksi URL saat ini
   const isDashboardHome = pathname === '/dashboard'; 
   const isSettings = pathname.includes('/settings'); 
   const isEducation = pathname.includes('/education'); 
+  const isReadingArticle = pathname.startsWith('/dashboard/education/') && pathname !== '/dashboard/education';
   const isChat = pathname.includes('/chat');
   const isFacilities = pathname.includes('/facilities');
+
+  if (isReadingArticle) return null;
+
+  // Mengambil kata pertama dari nama untuk sapaan (opsional, agar terlihat natural)
+  const firstName = userName.split(' ')[0];
 
   return (
     <header className="h-24 px-8 flex items-center justify-between shrink-0 relative z-10">
       
-      {/* ==========================================
-          AREA KIRI: JUDUL HALAMAN DINAMIS
-          ========================================== */}
       <div className="flex-1">
         <AnimatePresence mode="wait">
           
           {isDashboardHome && (
             <motion.div key="dashboard" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }} transition={{ duration: 0.3 }} className="flex flex-col">
-              <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Selamat datang kembali, Kamal 👋</h1>
+              {/* 🌟 PERBAIKAN: Sapaan menjadi dinamis dari database */}
+              <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Selamat datang kembali, {firstName} 👋</h1>
               <p className="text-sm text-gray-500 font-medium mt-1">Pusat kontrol kesehatan digital Anda siap digunakan.</p>
             </motion.div>
           )}
@@ -68,14 +72,8 @@ export default function Header() {
         </AnimatePresence>
       </div>
 
-      {/* ==========================================
-          AREA KANAN: AKSI MINIMAL & PROFIL
-          ========================================== */}
       <div className="flex items-center gap-5 justify-end">
         
-        {/* Tombol Darurat Khusus Halaman Fasilitas */}
-
-        {/* Lonceng Notifikasi (Disembunyikan saat mode Chat) */}
         {!isChat && (
           <button className="relative p-2.5 bg-white/60 backdrop-blur-md border border-gray-200/60 rounded-full text-gray-500 hover:text-gray-900 transition-all hover:shadow-sm">
             <Bell className="w-5 h-5" />
@@ -83,11 +81,10 @@ export default function Header() {
           </button>
         )}
 
-        {/* Profile Menu Tetap Muncul */}
         <div className="flex items-center gap-3 pl-2 cursor-pointer group">
           <div className="text-right hidden sm:block">
-            <p className="text-sm font-bold text-gray-900 leading-none">Kamal Ilham</p>
-            <p className="text-xs text-indigo-600 font-semibold mt-1">Pharmacist</p>
+            {/* 🌟 PERBAIKAN: Nama dinamis dari database, dan teks sekunder dihapus sesuai instruksi */}
+            <p className="text-sm font-bold text-gray-900 leading-none">{userName}</p>
           </div>
           <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-cyan-100 to-indigo-100 border border-white shadow-sm flex items-center justify-center overflow-hidden group-hover:ring-2 ring-indigo-500/30 transition-all">
             <User className="w-5 h-5 text-indigo-600" />

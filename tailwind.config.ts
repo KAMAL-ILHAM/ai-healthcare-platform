@@ -45,7 +45,9 @@ const config: Config = {
       }
     },
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/typography'), // <-- TAMBAHKAN BARIS INI
+  ],
 };
 
 export default config;
