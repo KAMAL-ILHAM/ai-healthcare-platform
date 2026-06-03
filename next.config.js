@@ -1,14 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Tambahkan kode rewrites ini
-  async rewrites() {
-    return [
-      {
-        source: '/api/overpass',
-        destination: 'https://overpass-api.de/api/interpreter', // Mengelabui CORS
-      },
-    ];
-  },
+  // Tambahkan konfigurasi di sini jika diperlukan, 
+  // tapi untuk sekarang biarkan kosong seperti ini:
 };
 
-export default nextConfig; // (atau module.exports = nextConfig; jika file .js)
+module.exports = nextConfig;
