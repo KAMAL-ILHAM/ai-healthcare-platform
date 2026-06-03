@@ -77,19 +77,20 @@ export default function Navbar() {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 flex justify-center p-4 md:p-6 pointer-events-none">
+    <header className="fixed top-0 left-0 right-0 z-50 flex flex-col items-center p-4 md:p-6 pointer-events-none">
+      {/* 🌟 KAPSUL NAVBAR UTAMA */}
       <motion.nav
         initial={{ width: '80%', opacity: 0, y: -20 }}
         animate={{ width: '95%', opacity: 1, y: 0 }}
         transition={{ type: "spring", stiffness: 200, damping: 25 }}
         className={`
-            pointer-events-auto flex items-center justify-between px-8 
+            pointer-events-auto flex items-center justify-between px-6 md:px-8 
             transition-all duration-300 ease-in-out
             rounded-[2rem] border
             ${isScrolled ? 'h-16' : 'h-20'} 
             ${isScrolled 
-              ? 'bg-white/70 backdrop-blur-2xl border-white/80 shadow-[0_8px_30px_rgba(0,0,0,0.06)]' 
-              : 'bg-white/40 backdrop-blur-xl border-white/60 shadow-sm ring-1 ring-black/5'
+              ? 'bg-white/80 backdrop-blur-2xl border-white/80 shadow-[0_8px_30px_rgba(0,0,0,0.06)]' 
+              : 'bg-white/60 backdrop-blur-xl border-white/60 shadow-sm ring-1 ring-black/5'
             }
         `}
       >
@@ -102,7 +103,7 @@ export default function Navbar() {
           </span>
         </Link>
 
-        {/* Desktop Navigation */}
+        {/* 🌟 DESKTOP NAVIGATION */}
         <div className="hidden md:flex items-center gap-1">
           {/* Loop Menu Utama */}
           {mainLinks.map((link) => {
@@ -117,7 +118,7 @@ export default function Navbar() {
                 onClick={(e) => handleScrollToSection(e, link.href)}
                 onMouseEnter={() => setHoveredLink(link.name)}
                 onMouseLeave={() => setHoveredLink(null)}
-                className={`relative px-4 py-2 text-sm font-semibold transition-colors ${isActive || isHovered ? 'text-primary' : 'text-gray-600 hover:text-primary'}`}
+                className={`relative px-4 py-2 text-sm font-semibold transition-colors ${isActive || isHovered ? 'text-indigo-600' : 'text-gray-600 hover:text-indigo-600'}`}
               >
                 <div className="flex items-center gap-2">
                     <link.icon className="w-4 h-4" />
@@ -131,7 +132,7 @@ export default function Navbar() {
                     animate={{ opacity: 1, scaleX: 1 }}
                     exit={{ opacity: 0, scaleX: 0 }}
                     transition={{ type: "spring", stiffness: 300, damping: 25, duration: 0.3 }}
-                    className="absolute bottom-0 left-4 right-4 h-0.5 bg-primary rounded-full"
+                    className="absolute bottom-0 left-4 right-4 h-0.5 bg-indigo-600 rounded-full"
                   />
                 )}
               </a>
@@ -144,7 +145,7 @@ export default function Navbar() {
             onMouseEnter={() => setIsDropdownOpen(true)}
             onMouseLeave={() => setIsDropdownOpen(false)}
           >
-            <button className={`flex items-center gap-1 px-4 py-2 text-sm font-semibold transition-colors ${isDropdownOpen ? 'text-primary' : 'text-gray-600 hover:text-primary'}`}>
+            <button className={`flex items-center gap-1 px-4 py-2 text-sm font-semibold transition-colors ${isDropdownOpen ? 'text-indigo-600' : 'text-gray-600 hover:text-indigo-600'}`}>
               Lainnya
               <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} />
             </button>
@@ -157,14 +158,14 @@ export default function Navbar() {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
                   transition={{ duration: 0.2 }}
-                  className="absolute top-full right-0 mt-4 w-56 bg-white/90 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-100 p-2 flex flex-col gap-1 origin-top-right"
+                  className="absolute top-full right-0 mt-4 w-56 bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-100 p-2 flex flex-col gap-1 origin-top-right"
                 >
                   {dropdownLinks.map((link) => (
                     <a
                       key={link.name}
                       href={link.href}
                       onClick={(e) => handleScrollToSection(e, link.href)}
-                      className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-600 hover:text-primary hover:bg-indigo-50/50 rounded-xl transition-colors"
+                      className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-600 hover:text-indigo-600 hover:bg-indigo-50/50 rounded-xl transition-colors"
                     >
                       <link.icon className="w-4 h-4" />
                       {link.name}
@@ -176,7 +177,7 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Action Button */}
+        {/* 🌟 ACTION BUTTONS (DESKTOP) */}
         <div className="hidden md:flex items-center gap-4 shrink-0">
           <Link href="/login" className="text-sm font-bold text-gray-600 hover:text-gray-900 transition-colors">
             Masuk
@@ -194,10 +195,85 @@ export default function Navbar() {
           </Link>
         </div>
 
-        <button className="md:hidden p-2" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-          {mobileMenuOpen ? <X /> : <Menu />}
+        {/* 🌟 TOMBOL HAMBURGER (MOBILE) */}
+        <button 
+          className="md:hidden p-2.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100/50 rounded-full transition-colors" 
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        >
+          {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
       </motion.nav>
+
+      {/* 🌟 MENU DROPDOWN SELULER (MOBILE MENU) */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            className="pointer-events-auto absolute top-[90px] w-[92%] max-h-[80vh] overflow-y-auto bg-white/95 backdrop-blur-2xl rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-gray-100 p-5 flex flex-col gap-4 md:hidden scrollbar-thin"
+          >
+            {/* Navigasi Utama */}
+            <div className="flex flex-col gap-1">
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 px-3">Menu Utama</p>
+              {mainLinks.map((link) => {
+                const isActive = activeSection === link.href;
+                return (
+                  <a
+                    key={link.name}
+                    href={link.href}
+                    onClick={(e) => handleScrollToSection(e, link.href)}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${isActive ? 'bg-indigo-50 text-indigo-600' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}
+                  >
+                    <link.icon className="w-5 h-5" />
+                    {link.name}
+                  </a>
+                );
+              })}
+            </div>
+
+            <hr className="border-gray-100 my-1" />
+
+            {/* Navigasi Lainnya */}
+            <div className="flex flex-col gap-1">
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 px-3">Lainnya</p>
+              {dropdownLinks.map((link) => (
+                <a
+                  key={link.name}
+                  href={link.href}
+                  onClick={(e) => handleScrollToSection(e, link.href)}
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+                >
+                  <link.icon className="w-5 h-5 text-gray-400" />
+                  {link.name}
+                </a>
+              ))}
+            </div>
+
+            <hr className="border-gray-100 my-1" />
+
+            {/* Auth Buttons */}
+            <div className="flex flex-col gap-3 mt-2">
+              <Link 
+                href="/login" 
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full py-3.5 text-center text-sm font-bold text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors"
+              >
+                Masuk
+              </Link>
+              <Link 
+                href="/register" 
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full py-3.5 text-center text-sm font-bold text-white bg-gray-900 hover:bg-gray-800 rounded-xl transition-colors shadow-md flex items-center justify-center gap-2"
+              >
+                Buat Akun Baru
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }
