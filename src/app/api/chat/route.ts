@@ -8,8 +8,6 @@ import {
 import { groq } from '@ai-sdk/groq';
 
 import {
-  applyAttachmentToMessages,
-  buildPromptWithAttachment,
   createFallbackStreamResponse,
   getAIAbortSignal,
   getTextFromUIMessage,
@@ -52,7 +50,9 @@ export async function POST(req: Request) {
 
     const body = await req.json();
     sessionId = body.sessionId;
-    const { messages, attachmentId } = body;
+    
+    // Lampiran sudah dihapus dari sini
+    const { messages } = body;
 
     if (!sessionId) return NextResponse.json({ error: 'Session ID diperlukan.' }, { status: 400 });
 
@@ -78,8 +78,6 @@ export async function POST(req: Request) {
       content: userText,
     }).catch((err: any) => console.error('[DB_SAVE_USER_ERROR]', err));
 
-    const attachment = attachmentId ? await prisma.attachment.findUnique({ where: { id: attachmentId } }) : null;
-    
     const baseSystemPrompt = `
       # Aturan Jawaban
       1. Jawab sesuai pertanyaan pengguna.
@@ -109,8 +107,9 @@ export async function POST(req: Request) {
         try {
           const result = streamText({
             model: groq('llama-3.3-70b-versatile'),
-            system: buildPromptWithAttachment(baseSystemPrompt, attachment),
-            messages: await convertToModelMessages(applyAttachmentToMessages(uiMessages, attachment)),
+            // Prompt dan Messages kini langsung dikirim tanpa fungsi lampiran
+            system: baseSystemPrompt,
+            messages: await convertToModelMessages(uiMessages),
             // 🌟 PERBAIKAN 3: Ubah temperature sedikit lebih rendah agar output teks lebih stabil
             temperature: 0.6, 
             abortSignal: getAIAbortSignal(),

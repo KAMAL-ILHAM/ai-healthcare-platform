@@ -3,27 +3,28 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
-  id                String        @id @default(uuid())
-  email             String        @unique
-  passwordHash      String
-  createdAt         DateTime      @default(now())
-  name              String?
-  role              String        @default("patient")
+  id              String        @id @default(uuid())
+  email           String        @unique
+  passwordHash    String
+  createdAt       DateTime      @default(now())
+  name            String?
+  role            String        @default("patient")
   
   // =========================================
   // KOLOM BARU: Kunci Akses Halaman Admin
   // =========================================
-  isStaff           Boolean       @default(false) 
+  isStaff         Boolean       @default(false) 
 
-  updatedAt         DateTime?     @default(now()) @updatedAt @map("updatedAt") @db.Timestamp(6)
+  updatedAt       DateTime?     @default(now()) @updatedAt @map("updatedAt") @db.Timestamp(6)
   
-  chat_sessions     ChatSession[]
-  articles          Article[]
+  chat_sessions   ChatSession[]
+  articles        Article[]
   createdCategories Category[]
 
   @@map("users")
@@ -36,6 +37,7 @@ model ChatSession {
   createdAt     DateTime      @default(now())
   updatedAt     DateTime
   isArchived    Boolean?      @default(false)
+  
   chat_messages ChatMessage[]
   users         User          @relation(fields: [userId], references: [id], map: "chat_sessions_user_id_fkey")
 
@@ -43,25 +45,15 @@ model ChatSession {
 }
 
 model ChatMessage {
-  id            String       @id @default(uuid())
+  id            String        @id @default(uuid())
   content       String
-  role          String       
-  sessionId     String       
-  createdAt     DateTime     @default(now())
-  attachments   Attachment[]
+  role          String        
+  sessionId     String        
+  createdAt     DateTime      @default(now())
 
-  chat_sessions ChatSession  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  chat_sessions ChatSession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
   @@map("chat_messages")
-}
-
-model Attachment {
-  id            String      @id @default(uuid())
-  file_url      String
-  message_id    String
-  chat_messages ChatMessage @relation(fields: [message_id], references: [id], onDelete: Cascade)
-
-  @@map("attachments")
 }
 
 // =========================================

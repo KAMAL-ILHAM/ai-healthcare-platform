@@ -456,7 +456,7 @@ export default function ChatPage() {
                     /^(?:\*\*)?(Rekomendasi(?: Farmasi)?|Saran(?: Dokter)?|Penting|Catatan|Kesimpulan|Perhatian)(?:\*\*)?:\s*([\s\S]*?)(?=\n\n|$)/gmi, 
                     (match, title, content) => {
                       const cleanContent = content.replace(/^>\s*/gm, '');
-                      const quotedContent = cleanContent.split('\n').map(line => `> ${line}`).join('\n');
+                      const quotedContent = cleanContent.split('\n').map((line: string) => `> ${line}`).join('\n');
                       return `> **${title}:**\n${quotedContent}\n\n`;
                     }
                   );

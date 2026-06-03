@@ -37,12 +37,19 @@ export async function POST(req: Request) {
   }
 }
 
-export async function DELETE(
-  req: Request,
-  { params }: { params: { sessionId: string } }
-) {
+export async function DELETE(req: Request) {
   try {
-    const { sessionId } = params;
+    // Ambil sessionId dari URL (contoh: /api/chat/session?sessionId=123)
+    const url = new URL(req.url);
+    const sessionId = url.searchParams.get("sessionId");
+
+    // Validasi jika sessionId kosong
+    if (!sessionId) {
+      return NextResponse.json(
+        { error: 'Session ID tidak ditemukan pada URL' }, 
+        { status: 400 }
+      );
+    }
 
     // Menghapus dari database berdasarkan sessionId
     await prisma.chatSession.delete({

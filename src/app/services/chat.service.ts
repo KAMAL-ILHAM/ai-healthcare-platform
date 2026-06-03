@@ -37,7 +37,6 @@ export class ChatService {
     return await prisma.chatMessage.findMany({
       where: { sessionId },
       orderBy: { createdAt: 'asc' }, // Urutkan dari pesan tertua ke terbaru
-      include: { attachments: true } // Ambil juga data file lampiran jika ada
     });
   }
 
