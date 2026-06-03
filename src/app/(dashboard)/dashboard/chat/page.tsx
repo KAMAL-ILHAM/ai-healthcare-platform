@@ -8,11 +8,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import {
-  Send, Mic, Paperclip, Bot,
-  MessageSquare, Loader2, AlertCircle,
+  Send, Mic, Bot, MessageSquare, Loader2, AlertCircle,
   Home, Copy, RefreshCcw, Trash2, Check, FileText, Image as ImageIcon, X,
-  Activity, Pill, MapPin, FileUp, BookOpen, 
-  Plus, Search, History, Settings
+  Activity, Plus, Search, History, Settings, Sparkles
 } from 'lucide-react';
 import { getFriendlyChatError } from '@/lib/ai-errors';
 
@@ -41,6 +39,69 @@ function getMessageText(message: UIMessage): string {
     .join('');
 }
 
+// 🌟 KOMPONEN DESAIN MARKDOWN
+const MemoizedMarkdownComponents: any = {
+  p: ({ children }: any) => <p className="mb-4 last:mb-0 text-[15px] leading-relaxed text-slate-700 whitespace-pre-wrap">{children}</p>,
+  strong: ({ children }: any) => <strong className="font-bold text-slate-900">{children}</strong>,
+  ul: ({ children }: any) => <ul className="list-disc pl-5 mb-5 space-y-2 text-[15px] text-slate-700 marker:text-slate-400">{children}</ul>,
+  ol: ({ children }: any) => <ol className="list-decimal pl-5 mb-5 space-y-2 text-[15px] text-slate-700 marker:text-slate-600 marker:font-medium">{children}</ol>,
+  li: ({ children }: any) => <li className="leading-relaxed pl-1">{children}</li>,
+  blockquote: ({ children }: any) => (
+    <div className="bg-indigo-50/40 border border-indigo-100 p-4 sm:p-5 rounded-[16px] flex flex-col sm:flex-row gap-3 sm:gap-4 my-6 shadow-sm relative overflow-hidden">
+      <div className="absolute left-0 top-0 bottom-0 w-1 bg-indigo-500"></div>
+      <div className="mt-0.5 shrink-0 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm border border-indigo-50 ml-1">
+        <Activity className="w-4 h-4 text-indigo-600" />
+      </div>
+      <div className="flex-1 text-[15px] leading-relaxed text-slate-700 [&>p]:mb-3 last:[&>p]:mb-0 [&_strong]:!text-slate-900 [&_strong]:text-[15px] [&_ul]:mb-0 [&_ol]:mb-0">
+        {children}
+      </div>
+    </div>
+  ),
+  table: ({ children }: any) => (
+    <div className="overflow-x-auto my-6 border border-slate-200 rounded-[12px] shadow-sm">
+      <table className="w-full text-[14px] text-left text-slate-600 min-w-[500px]">{children}</table>
+    </div>
+  ),
+  thead: ({ children }: any) => <thead className="bg-slate-50 text-slate-900 font-semibold border-b border-slate-200">{children}</thead>,
+  tbody: ({ children }: any) => <tbody className="divide-y divide-slate-100 bg-white">{children}</tbody>,
+  tr: ({ children }: any) => <tr className="hover:bg-slate-50/50 transition-colors">{children}</tr>,
+  th: ({ children }: any) => <th className="px-5 py-3.5 whitespace-nowrap">{children}</th>,
+  td: ({ children }: any) => <td className="px-5 py-4 align-top leading-relaxed">{children}</td>,
+  h3: ({ children }: any) => <h3 className="text-lg font-bold text-slate-900 mt-6 mb-3">{children}</h3>,
+  h4: ({ children }: any) => <h4 className="text-base font-bold text-slate-900 mt-5 mb-2">{children}</h4>,
+};
+
+// 🌟 MESIN TIK AJAIB (ANTI-LAG)
+const RevealTypewriter = ({ text, onType }: { text: string, onType: () => void }) => {
+  const [content, setContent] = useState('');
+
+  useEffect(() => {
+    let i = 0;
+    const charsPerTick = Math.max(2, Math.floor(text.length / 50)); 
+    
+    const interval = setInterval(() => {
+      i += charsPerTick;
+      if (i >= text.length) {
+        setContent(text);
+        clearInterval(interval);
+        onType(); 
+      } else {
+        setContent(text.slice(0, i));
+        onType(); 
+      }
+    }, 20); 
+
+    return () => clearInterval(interval);
+  }, [text, onType]);
+
+  return (
+    <ReactMarkdown remarkPlugins={[remarkGfm]} components={MemoizedMarkdownComponents}>
+      {content}
+    </ReactMarkdown>
+  );
+};
+
+
 export default function ChatPage() {
   const router = useRouter();
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
@@ -64,7 +125,6 @@ export default function ChatPage() {
     status,
     error,
     clearError,
-    reload,
   } = useChat({
     id: currentSessionId ?? 'pending-session',
     transport,
@@ -74,7 +134,7 @@ export default function ChatPage() {
     },
   });
 
-  const isLoading = status === 'submitted' || status === 'streaming';
+  const isProcessing = status === 'submitted' || status === 'streaming';
 
   const loadSessionMessages = useCallback(async (sessionId: string) => {
     try {
@@ -91,16 +151,46 @@ export default function ChatPage() {
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    if (status !== 'ready' || (!input.trim() && attachments.length === 0) || !currentSessionId) return;
+    if (isProcessing || (!input.trim() && attachments.length === 0) || !currentSessionId) return;
+
+    const userText = input.trim();
+
+    // 🌟 PERBAIKAN: Ubah judul di Sidebar secara otomatis (Optimistic Update)
+    setSessions((prevSessions) => 
+      prevSessions.map((session) => {
+        // Jika ini adalah sesi yang sedang aktif dan judulnya masih "Konsultasi Baru"
+        if (session.id === currentSessionId && (session.title === 'Konsultasi Baru' || session.title === 'New Chat')) {
+          // Ambil maksimal 4 kata pertama sebagai judul
+          const words = userText.split(' ');
+          const newTitle = words.length > 4 ? words.slice(0, 4).join(' ') + '...' : userText;
+          return { ...session, title: newTitle };
+        }
+        return session;
+      })
+    );
 
     setServiceError(null);
     clearError();
     sendMessage(
-      { text: input.trim() },
+      { text: userText },
       { body: { sessionId: currentSessionId, attachments: attachments } }
     );
     setInput('');
     setAttachments([]);
+  };
+
+  const handleReload = () => {
+    const lastUserIndex = messages.map(m => m.role).lastIndexOf('user');
+    if (lastUserIndex === -1 || !currentSessionId) return;
+
+    const lastUserMessage = messages[lastUserIndex];
+    const previousMessages = messages.slice(0, lastUserIndex);
+    setMessages(previousMessages);
+
+    sendMessage(
+      { text: getMessageText(lastUserMessage) },
+      { body: { sessionId: currentSessionId } }
+    );
   };
 
   const handleFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
@@ -174,10 +264,11 @@ export default function ChatPage() {
     }
   };
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-  useEffect(() => { scrollToBottom(); }, [messages, isLoading, attachments]);
+  const scrollToBottom = useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
+  }, []);
+
+  useEffect(() => { scrollToBottom(); }, [messages, isProcessing, attachments, scrollToBottom]);
 
   const toggleMic = () => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -203,7 +294,6 @@ export default function ChatPage() {
     recognition.start();
   };
 
-  // --- TRIK NINJA: Sembunyikan sidebar dashboard saat masuk halaman AI ---
   useEffect(() => {
     const globalSidebars = document.querySelectorAll('aside, nav, [class*="sidebar" i]');
     globalSidebars.forEach((el) => {
@@ -216,22 +306,18 @@ export default function ChatPage() {
       });
     };
   }, []);
-  // ----------------------------------------------------------------------
 
   return (
     <div className="fixed inset-0 z-[9999] flex h-screen w-full font-sans antialiased text-slate-800 bg-[#FFFFFF]">
       
-      {/* 1. SIDEBAR KIRI 68px DENGAN OUTLINE YANG LEBIH TEGAS */}
+      {/* SIDEBAR KIRI 68px */}
       <div className="w-[68px] shrink-0 bg-[#F8FAFC] border-r border-slate-200 flex flex-col items-center py-4 justify-between z-20 shadow-[2px_0_15px_rgba(0,0,0,0.03)]">
         <div className="flex flex-col items-center gap-4 w-full">
-          {/* Logo EIOHealth - Sekarang murni pajangan (bukan tag button) */}
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#4F46E5] to-[#06B6D4] flex items-center justify-center shadow-md">
             <Bot className="w-5 h-5 text-white" />
           </div>
-          
           <div className="w-6 h-[1px] bg-slate-200 my-1"></div>
           
-          {/* Menu Icons */}
           <button onClick={createNewSession} className="w-10 h-10 rounded-xl hover:bg-slate-200/60 flex items-center justify-center text-slate-500 transition-colors" title="New Chat">
             <Plus className="w-5 h-5" />
           </button>
@@ -248,18 +334,16 @@ export default function ChatPage() {
         </div>
 
         <div className="flex flex-col items-center gap-4 w-full">
-          {/* Tombol Pengaturan - Redirect ke halaman Settings */}
           <button onClick={() => router.push('/dashboard/settings')} className="w-10 h-10 rounded-xl hover:bg-slate-200/60 flex items-center justify-center text-slate-500 transition-colors" title="Settings">
             <Settings className="w-5 h-5" />
           </button>
-          {/* Avatar User */}
           <div className="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center text-white cursor-pointer shadow-sm" title="Kamal Ilham | Pharmacist">
             <span className="text-[11px] font-bold">KI</span>
           </div>
         </div>
       </div>
 
-      {/* 2. DRAWER HISTORY (SLIDING DARI SAMPING SIDEBAR) */}
+      {/* DRAWER HISTORY */}
       <AnimatePresence>
         {isHistoryOpen && (
           <motion.div
@@ -302,21 +386,22 @@ export default function ChatPage() {
         )}
       </AnimatePresence>
 
-      {/* 3. MAIN AREA (OBROLAN) */}
+      {/* MAIN AREA (OBROLAN) */}
       <div 
         className="flex-1 flex flex-col h-screen overflow-hidden relative"
         style={{ background: 'linear-gradient(180deg, #F8FBFF 0%, #FFFFFF 100%)' }}
       >
-        {/* HEADER MINIMALIS DENGAN TOMBOL DASHBOARD KANAN ATAS */}
-        <header className="absolute top-0 w-full p-4 flex items-center justify-between z-10 pointer-events-none">
-          <div className="text-[14px] font-semibold text-slate-700 pointer-events-auto bg-white/60 px-4 py-2 rounded-full backdrop-blur-md border border-slate-200/60 shadow-sm">
+        
+        {/* 🌟 KAPSUL HEADER (Posisi diperlebar dan efek glass dipertahankan) */}
+        <header className="absolute top-0 left-0 w-full pt-6 px-6 sm:px-10 z-30 flex items-start justify-between pointer-events-none">
+          <div className="pointer-events-auto flex items-center gap-2.5 text-[14px] font-semibold text-slate-700 bg-white/80 px-5 py-2.5 rounded-full backdrop-blur-md border border-slate-200/60 shadow-sm">
+            <Bot className="w-4 h-4 text-indigo-500" />
             EIO Health AI
           </div>
           
-          {/* Tombol Kembali ke Dashboard */}
           <button 
             onClick={() => router.push('/dashboard')}
-            className="pointer-events-auto flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 hover:border-indigo-300 text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-full shadow-sm transition-all duration-200 text-[13px] font-semibold"
+            className="pointer-events-auto flex items-center gap-2 px-5 py-2.5 bg-white/80 backdrop-blur-md border border-slate-200 hover:border-indigo-300 text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-full shadow-sm transition-all duration-200 text-[13px] font-semibold"
             title="Kembali ke Dashboard"
           >
             <Home className="w-4 h-4" />
@@ -324,8 +409,15 @@ export default function ChatPage() {
           </button>
         </header>
 
-        {/* AREA CHAT (Lebar Max 800px) */}
-        <main className="flex-1 overflow-y-auto w-full pt-20 pb-40 px-4 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
+        {/* 🌟 MASKER GRADASI MENGGUNAKAN INLINE CSS MUTLAK (DIJAMIN KERJA 100%) */}
+        {/* Masker ini membuat teks yang discroll menghilang tepat di bawah kapsul header */}
+        <div 
+          className="absolute top-0 left-0 w-full h-40 z-20 pointer-events-none"
+          style={{ background: 'linear-gradient(180deg, #F8FBFF 45%, rgba(248, 251, 255, 0) 100%)' }}
+        />
+
+        {/* AREA CHAT (pt-32 agar teks mulai di bawah masker tebal saat pertama kali masuk) */}
+        <main className="flex-1 overflow-y-auto w-full pt-32 pb-40 px-4 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
           
           {/* EMPTY STATE */}
           {messages.length === 0 && (
@@ -333,7 +425,6 @@ export default function ChatPage() {
               <h1 className="text-3xl font-bold text-slate-800 mb-2 tracking-tight">EIOHealth AI Assistant</h1>
               <p className="text-slate-500 text-[15px] mb-12">Konsultasi kesehatan cerdas berbasis AI</p>
               
-              {/* Prompt Suggestions Chips */}
               <div className="flex flex-wrap justify-center gap-3 w-full">
                 {quickPrompts.map((btn, idx) => (
                   <button
@@ -347,43 +438,72 @@ export default function ChatPage() {
             </div>
           )}
 
-          {/* ACTIVE CHAT */}
-          <div className="w-full max-w-[800px] mx-auto flex flex-col pt-4">
+          {/* ACTIVE CHAT AREA */}
+          <div className="w-full max-w-[850px] mx-auto flex flex-col gap-6 relative z-10">
             <AnimatePresence initial={false}>
               {messages.map((msg, idx) => {
                 const isUser = msg.role === 'user';
-                const msgText = getMessageText(msg);
+                const isLastMsg = idx === messages.length - 1;
+                
+                if (!isUser && isLastMsg && isProcessing) {
+                  return null; 
+                }
+
+                let msgText = getMessageText(msg);
+
+                if (!isUser) {
+                  msgText = msgText.replace(
+                    /^(?:\*\*)?(Rekomendasi(?: Farmasi)?|Saran(?: Dokter)?|Penting|Catatan|Kesimpulan|Perhatian)(?:\*\*)?:\s*([\s\S]*?)(?=\n\n|$)/gmi, 
+                    (match, title, content) => {
+                      const cleanContent = content.replace(/^>\s*/gm, '');
+                      const quotedContent = cleanContent.split('\n').map(line => `> ${line}`).join('\n');
+                      return `> **${title}:**\n${quotedContent}\n\n`;
+                    }
+                  );
+                }
                 
                 return (
                   <motion.div
                     key={msg.id || idx}
-                    initial={{ opacity: 0, y: 5 }}
+                    initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="flex w-full mb-8"
+                    className="flex w-full"
                   >
                     {isUser ? (
-                      /* USER BUBBLE (Kanan) */
-                      <div className="ml-auto px-5 py-3.5 bg-gradient-to-r from-[#4F46E5] to-[#06B6D4] text-white rounded-[24px] max-w-[85%] shadow-sm">
-                        <div className="text-[15px] leading-relaxed whitespace-pre-wrap">{msgText}</div>
+                      /* BUBBLE USER */
+                        <div className="ml-auto px-6 py-4 bg-slate-900 text-white rounded-3xl rounded-br-md shadow-sm max-w-[85%] md:max-w-[75%]">
+                        <div className="text-[15px] font-medium leading-relaxed whitespace-pre-wrap">{msgText}</div>
                       </div>
                     ) : (
-                      /* AI BUBBLE (Kiri) */
-                      <div className="mr-auto px-6 py-4 bg-white border border-[rgba(0,0,0,0.08)] text-slate-800 rounded-[24px] max-w-[95%] shadow-sm flex flex-col">
-                        <div className="prose prose-slate prose-sm md:prose-base prose-headings:font-semibold prose-a:text-indigo-600 prose-p:leading-relaxed max-w-none">
-                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                            {msgText}
-                          </ReactMarkdown>
+                      /* BUBBLE AI & AVATAR UNGU */
+                      <div className="mr-auto flex gap-4 w-full max-w-[95%] md:max-w-[90%] z-0">
+                        
+                        <div className="flex w-10 h-10 md:w-12 md:h-12 rounded-full bg-indigo-600 items-center justify-center shrink-0 mt-1 shadow-md shadow-indigo-500/20">
+                          <Sparkles className="w-5 h-5 md:w-6 md:h-6 text-white" />
                         </div>
-                        {/* Tools Bawah Chat AI */}
-                        <div className="flex items-center gap-1 mt-3 text-slate-400">
-                          <button onClick={() => handleCopy(msgText, msg.id)} className="p-1.5 hover:text-indigo-600 hover:bg-slate-50 rounded-md transition-colors" title="Copy">
-                            {copiedId === msg.id ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
-                          </button>
-                          {idx === messages.length - 1 && (
-                            <button onClick={() => reload()} className="p-1.5 hover:text-indigo-600 hover:bg-slate-50 rounded-md transition-colors" title="Regenerate">
-                              <RefreshCcw className="w-4 h-4" />
+                        
+                        <div className="flex flex-col items-start gap-1 w-full min-w-0">
+                          
+                          <div className="w-full px-5 py-5 md:px-7 md:py-6 bg-white border border-slate-200 rounded-3xl rounded-tl-md shadow-sm">
+                            {isLastMsg && !isProcessing ? (
+                              <RevealTypewriter text={msgText} onType={scrollToBottom} />
+                            ) : (
+                              <ReactMarkdown remarkPlugins={[remarkGfm]} components={MemoizedMarkdownComponents}>
+                                {msgText}
+                              </ReactMarkdown>
+                            )}
+                          </div>
+                          
+                          <div className="flex items-center gap-1 ml-1 mt-1 text-slate-400">
+                            <button onClick={() => handleCopy(msgText, msg.id)} className="p-1.5 hover:text-indigo-600 hover:bg-slate-100 rounded-lg transition-colors" title="Salin Teks">
+                              {copiedId === msg.id ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
                             </button>
-                          )}
+                            {isLastMsg && (
+                              <button onClick={handleReload} className="p-1.5 hover:text-indigo-600 hover:bg-slate-100 rounded-lg transition-colors" title="Muat Ulang Jawaban">
+                                <RefreshCcw className="w-4 h-4" />
+                              </button>
+                            )}
+                          </div>
                         </div>
                       </div>
                     )}
@@ -392,22 +512,29 @@ export default function ChatPage() {
               })}
             </AnimatePresence>
 
-            {/* TYPING INDICATOR */}
-            {isLoading && messages.length > 0 && messages[messages.length - 1].role === 'user' && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex w-full mb-8">
-                <div className="mr-auto px-6 py-5 bg-white border border-[rgba(0,0,0,0.08)] rounded-[24px] shadow-sm flex items-center gap-1.5 h-[50px]">
-                  <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1.2 }} className="w-2 h-2 bg-slate-300 rounded-full" />
-                  <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1.2, delay: 0.2 }} className="w-2 h-2 bg-slate-300 rounded-full" />
-                  <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1.2, delay: 0.4 }} className="w-2 h-2 bg-slate-300 rounded-full" />
+            {isProcessing && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex w-full">
+                <div className="mr-auto flex gap-4 w-full max-w-[95%] md:max-w-[90%]">
+                  <div className="flex w-10 h-10 md:w-12 md:h-12 rounded-full bg-indigo-600 items-center justify-center shrink-0 mt-1 shadow-md shadow-indigo-500/20">
+                    <Sparkles className="w-5 h-5 md:w-6 md:h-6 text-white animate-pulse" />
+                  </div>
+                  <div className="px-6 py-5 bg-white border border-slate-200 rounded-[28px] rounded-tl-[8px] shadow-sm flex items-center gap-3 w-fit h-[56px] md:h-[64px]">
+                    <span className="text-[14px] font-medium text-slate-500">Menganalisis</span>
+                    <div className="flex items-center gap-1.5 pt-1">
+                      <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                      <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                    </div>
+                  </div>
                 </div>
               </motion.div>
             )}
-            <div ref={messagesEndRef} className="h-1" />
+            <div ref={messagesEndRef} className="h-4" />
           </div>
         </main>
 
-        {/* 4. CHAT INPUT (Gaya ChatGPT) */}
-        <div className="absolute bottom-0 w-full bg-gradient-to-t from-white via-white/95 to-transparent pt-6 pb-8 px-4 pointer-events-none">
+        {/* 4. CHAT INPUT */}
+        <div className="absolute bottom-0 w-full bg-gradient-to-t from-white via-white/95 to-transparent pt-6 pb-8 px-4 pointer-events-none z-30">
           <div className="max-w-[800px] mx-auto w-full pointer-events-auto">
             
             {serviceError && (
@@ -440,7 +567,6 @@ export default function ChatPage() {
               <div className="relative">
                 <input type="file" id="file-upload" className="hidden" onChange={handleFileUpload} accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" />
                 <label htmlFor="file-upload" className="cursor-pointer p-2.5 m-0.5 flex text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors shrink-0">
-                  <Plus className="w-5 h-5" />
                 </label>
               </div>
               
@@ -450,13 +576,13 @@ export default function ChatPage() {
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
-                    if ((input.trim() || attachments.length > 0) && status === 'ready') handleSubmit(e);
+                    if ((input.trim() || attachments.length > 0) && !isProcessing) handleSubmit(e);
                   }
                 }}
                 placeholder={isListening ? "Mendengarkan..." : "Kirim pesan ke EIOHealth AI..."}
                 className="flex-1 bg-transparent border-none py-3 px-1 text-[15px] text-slate-800 placeholder:text-slate-400 focus:outline-none resize-none max-h-[150px] min-h-[44px] scrollbar-thin"
                 rows={1}
-                disabled={isLoading}
+                disabled={isProcessing}
                 onInput={(e) => {
                   e.currentTarget.style.height = 'auto';
                   e.currentTarget.style.height = `${e.currentTarget.scrollHeight}px`;
@@ -477,10 +603,10 @@ export default function ChatPage() {
 
               <button
                 type="submit"
-                disabled={isLoading || (!input.trim() && attachments.length === 0)}
-                className="p-2.5 m-0.5 rounded-full bg-black text-white disabled:bg-slate-100 disabled:text-slate-300 disabled:cursor-not-allowed hover:opacity-80 transition-opacity duration-200 shrink-0 flex items-center justify-center"
+                disabled={isProcessing || (!input.trim() && attachments.length === 0)}
+                className="p-2.5 m-0.5 rounded-full bg-slate-900 text-white disabled:bg-slate-100 disabled:text-slate-300 disabled:cursor-not-allowed hover:bg-indigo-600 transition-colors duration-200 shrink-0 flex items-center justify-center"
               >
-                {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-4 h-4 ml-0.5" />}
+                {isProcessing ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-4 h-4 ml-0.5" />}
               </button>
             </form>
 

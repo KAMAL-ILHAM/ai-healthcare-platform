@@ -103,7 +103,7 @@ export default function PenggunaClient({ users }: { users: any[] }) {
                     <td className="px-6 py-4">
                       <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-black uppercase tracking-wider ${user.isStaff ? 'bg-purple-50 text-purple-600 border border-purple-100/50' : 'bg-gray-100 text-gray-600 border border-gray-200/50'}`}>
                         {user.isStaff ? <ShieldCheck size={12} strokeWidth={3} /> : <User size={12} strokeWidth={3} />}
-                        {user.isStaff ? 'Apoteker / Admin' : 'Pengguna Umum'}
+                        {user.isStaff ? 'Admin' : 'Pengguna'}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-gray-500 font-medium">

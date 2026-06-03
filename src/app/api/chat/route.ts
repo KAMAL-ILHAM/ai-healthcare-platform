@@ -5,7 +5,6 @@ import {
   createUIMessageStreamResponse,
   type UIMessage,
 } from 'ai';
-// 1. IMPORT GROQ
 import { groq } from '@ai-sdk/groq';
 
 import {
@@ -22,9 +21,11 @@ import {
 } from '@/app/services/ai.service';
 import { ChatService } from '@/app/services/chat.service';
 import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma'; // <-- Kembali ke import standar (tanpa kurung kurawal)
+import prisma from '@/lib/prisma';
 
 export const maxDuration = 60;
+// 🌟 PERBAIKAN 1: Memaksa Next.js untuk tidak mem-buffer stream agar teks muncul per huruf
+export const dynamic = 'force-dynamic'; 
 
 async function saveAssistantMessage(sessionId: string, content: string) {
   try {
@@ -57,31 +58,61 @@ export async function POST(req: Request) {
 
     const uiMessages = messages as UIMessage[];
     const latestMessage = uiMessages[uiMessages.length - 1];
+    const userText = getTextFromUIMessage(latestMessage);
     
-    await ChatService.saveMessage({
-      sessionId,
-      role: 'USER',
-      content: getTextFromUIMessage(latestMessage),
-    });
-
-    if (!isAIConfigured()) {
-      const parsed = parseAIError(new Error('AI_API_KEY_MISSING'));
-      return buildFallbackResponse(parsed, uiMessages, sessionId);
+    // 🌟 PERBAIKAN: Update Judul di Database Jika Ini Pesan Pertama dari User
+    if (uiMessages.length === 1) {
+      const words = userText.split(' ');
+      const newTitle = words.length > 4 ? words.slice(0, 4).join(' ') + '...' : userText;
+      
+      // Update judul ke Database secara background (tanpa await agar tidak bikin lag API)
+      prisma.chatSession.update({
+        where: { id: sessionId },
+        data: { title: newTitle }
+      }).catch((err: any) => console.error('[DB_UPDATE_TITLE_ERROR]', err));
     }
 
+    ChatService.saveMessage({
+      sessionId,
+      role: 'USER',
+      content: userText,
+    }).catch((err: any) => console.error('[DB_SAVE_USER_ERROR]', err));
+
     const attachment = attachmentId ? await prisma.attachment.findUnique({ where: { id: attachmentId } }) : null;
-    const baseSystemPrompt = `Anda adalah EIOHealth AI, asisten kesehatan dan farmasi klinis tingkat lanjut. Berikan jawaban akurat dan ringkas. Jika terkait resep atau diagnosis, arahkan ke tenaga medis.`;
+    
+    const baseSystemPrompt = `
+      # Aturan Jawaban
+      1. Jawab sesuai pertanyaan pengguna.
+      2. Jangan menambahkan informasi yang tidak diminta.
+      3. Jangan keluar dari konteks pertanyaan.
+      4. Utamakan jawaban yang relevan dibanding jawaban yang panjang.
+      5. Berikan jawaban sesingkat mungkin tanpa mengurangi kejelasan.
+      6. Sesuaikan tingkat detail dengan kebutuhan pengguna.
+      7. Gunakan bahasa yang natural, profesional, dan mudah dipahami.
+      8. Gunakan paragraf pendek agar mudah dibaca.
+      9. Gunakan poin atau daftar hanya jika membantu keterbacaan.
+      10. Gunakan tabel jika diperlukan untuk perbandingan, rangkuman, atau agar informasi lebih mudah dipahami.
+      11. Hindari pengulangan informasi.
+      12. Jangan otomatis menambahkan tips, saran, peringatan, efek samping, dosis, kesimpulan, atau disclaimer kecuali diminta atau memang diperlukan untuk keamanan dan akurasi.
+
+      Contoh:
+      - Jika pengguna meminta definisi, berikan definisi.
+      - Jika pengguna meminta contoh, berikan contoh.
+      - Jika pengguna meminta langkah-langkah, berikan langkah-langkah.
+      - Jika pengguna meminta perbandingan, gunakan tabel.
+      - Jika pengguna meminta penjelasan lengkap, berikan penjelasan lengkap.
+    `;
     
     const stream = createUIMessageStream({
       originalMessages: uiMessages,
       execute: async ({ writer }) => {
         try {
           const result = streamText({
-            // 2. KITA GUNAKAN MODEL LLAMA 3 70B YANG SANGAT CERDAS DARI GROQ
             model: groq('llama-3.3-70b-versatile'),
             system: buildPromptWithAttachment(baseSystemPrompt, attachment),
             messages: await convertToModelMessages(applyAttachmentToMessages(uiMessages, attachment)),
-            temperature: 0.7,
+            // 🌟 PERBAIKAN 3: Ubah temperature sedikit lebih rendah agar output teks lebih stabil
+            temperature: 0.6, 
             abortSignal: getAIAbortSignal(),
           });
           writer.merge(result.toUIMessageStream());
@@ -90,7 +121,10 @@ export async function POST(req: Request) {
         }
       },
       onFinish: async ({ responseMessage, isAborted }) => {
-        if (!isAborted) await saveAssistantMessage(sessionId!, getTextFromUIMessage(responseMessage));
+        // AI menyimpan percakapan ke DB hanya setelah jawaban SELESAI diketik di layar
+        if (!isAborted && sessionId) {
+          await saveAssistantMessage(sessionId, getTextFromUIMessage(responseMessage));
+        }
       },
     });
 

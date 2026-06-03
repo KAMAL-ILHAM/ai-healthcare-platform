@@ -49,7 +49,8 @@ model ChatMessage {
   sessionId     String       
   createdAt     DateTime     @default(now())
   attachments   Attachment[]
-  chat_sessions ChatSession  @relation(fields: [sessionId], references: [id])
+
+  chat_sessions ChatSession  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
   @@map("chat_messages")
 }
@@ -58,7 +59,7 @@ model Attachment {
   id            String      @id @default(uuid())
   file_url      String
   message_id    String
-  chat_messages ChatMessage @relation(fields: [message_id], references: [id])
+  chat_messages ChatMessage @relation(fields: [message_id], references: [id], onDelete: Cascade)
 
   @@map("attachments")
 }

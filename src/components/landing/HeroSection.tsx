@@ -105,7 +105,7 @@ export default function HeroSection() {
                 <div className="w-3 h-3 rounded-full bg-green-400" />
               </div>
               <div className="text-xs font-bold tracking-wider text-gray-400 uppercase flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-emerald-500" /> AI Pharmacist Assistant
+                <ShieldCheck className="w-4 h-4 text-emerald-500" /> AI Assistant
               </div>
               <div className="w-16" />
             </div>

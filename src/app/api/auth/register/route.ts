@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/db'; // <-- Diperbaiki: Menggunakan db.ts yang benar
+import prisma from '@/lib/prisma'; // <-- Kembali ke import standar (tanpa kurung kurawal)
 import bcrypt from 'bcrypt';
 
 export async function POST(request: Request) {

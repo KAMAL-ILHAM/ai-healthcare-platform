@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { ChatService } from '@/app/services/chat.service'; 
+import prisma from '@/lib/prisma';
 
 // [GET] /api/chat/session -> Untuk Sidebar
 export async function GET(req: Request) {
@@ -33,5 +34,24 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error('[CREATE_SESSION_ERROR]', error);
     return NextResponse.json({ error: 'Gagal membuat sesi.' }, { status: 500 });
+  }
+}
+
+export async function DELETE(
+  req: Request,
+  { params }: { params: { sessionId: string } }
+) {
+  try {
+    const { sessionId } = params;
+
+    // Menghapus dari database berdasarkan sessionId
+    await prisma.chatSession.delete({
+      where: { id: sessionId }
+    });
+
+    return NextResponse.json({ success: true, message: 'Chat berhasil dihapus' });
+  } catch (error) {
+    console.error('[DELETE_SESSION_ERROR]', error);
+    return NextResponse.json({ error: 'Gagal menghapus chat' }, { status: 500 });
   }
 }
