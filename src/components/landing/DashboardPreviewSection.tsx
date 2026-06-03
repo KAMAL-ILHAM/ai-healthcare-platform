@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import { 
   LayoutDashboard, MessageSquare, MapPin, BookMarked, Settings, 
-  Search, Bell, Activity, HeartPulse, TrendingUp, Bot, ArrowUpRight, Sparkles 
+  Search, Bell, Activity, Sparkles, BookOpen, User, Shield, Plus, Mic, Send 
 } from 'lucide-react';
 
 export default function DashboardPreviewSection() {
@@ -14,10 +14,10 @@ export default function DashboardPreviewSection() {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-[500px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-cyan-400/5 rounded-full blur-[150px] pointer-events-none" />
 
-      <div className="container mx-auto px-6 max-w-7xl relative z-10">
+      <div className="container mx-auto px-6 max-w-[1400px] relative z-10">
         
         {/* SECTION HEADER */}
-        <div className="text-center max-w-3xl mx-auto mb-20">
+        <div className="text-center max-w-3xl mx-auto mb-16">
           <motion.div 
             initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-gray-100 shadow-sm mb-6"
@@ -40,185 +40,212 @@ export default function DashboardPreviewSection() {
         {/* DASHBOARD MOCKUP CONTAINER */}
         <motion.div 
           initial={{ opacity: 0, y: 60 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-          className="relative w-full rounded-[2.5rem] bg-white/60 backdrop-blur-3xl border border-white shadow-[0_40px_100px_rgba(0,0,0,0.06)] overflow-hidden flex flex-col h-[750px]"
+          className="relative w-full mx-auto rounded-[2rem] bg-[#F8FBFF] border-2 border-white/60 shadow-[0_30px_100px_rgba(0,0,0,0.08)] overflow-hidden flex h-[700px] md:h-[750px] lg:w-[95%] xl:w-[90%]"
         >
-          {/* macOS Window Header */}
-          <div className="h-14 border-b border-gray-100/50 flex items-center px-6 justify-between bg-white/50 shrink-0">
-            <div className="flex gap-2">
-              <div className="w-3 h-3 rounded-full bg-red-400" />
-              <div className="w-3 h-3 rounded-full bg-amber-400" />
-              <div className="w-3 h-3 rounded-full bg-green-400" />
+          
+          {/* LEFT SIDEBAR (Icon Only) - Meniru UI Asli */}
+          <div className="w-[80px] bg-white border-r border-slate-100 flex flex-col items-center py-6 justify-between shrink-0 z-20 shadow-[4px_0_24px_rgba(0,0,0,0.02)] hidden sm:flex">
+            <div className="flex flex-col gap-6 items-center w-full">
+              <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-cyan-400 rounded-2xl flex items-center justify-center shadow-md mb-4">
+                <Activity className="text-white w-6 h-6" />
+              </div>
+              
+              <div className="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 shadow-sm border border-indigo-100 cursor-pointer">
+                <LayoutDashboard className="w-5 h-5" />
+              </div>
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-slate-400 hover:bg-slate-50 cursor-pointer">
+                <Sparkles className="w-5 h-5" />
+              </div>
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-slate-400 hover:bg-slate-50 cursor-pointer">
+                <MapPin className="w-5 h-5" />
+              </div>
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-slate-400 hover:bg-slate-50 cursor-pointer">
+                <BookOpen className="w-5 h-5" />
+              </div>
             </div>
-            <div className="text-xs font-bold tracking-wider text-gray-400 uppercase flex items-center gap-2">
-              app.eiohealth.com
+
+            <div className="flex flex-col gap-4 items-center w-full">
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-slate-400 hover:bg-slate-50 cursor-pointer">
+                <Settings className="w-5 h-5" />
+              </div>
+              <div className="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center text-white text-xs font-bold shadow-md cursor-pointer">
+                KI
+              </div>
             </div>
-            <div className="w-16" />
           </div>
 
-          {/* MAIN DASHBOARD LAYOUT */}
-          <div className="flex flex-1 overflow-hidden">
+          {/* MAIN DASHBOARD CONTENT AREA */}
+          <div className="flex-1 flex flex-col overflow-hidden bg-[#F5F8FF]/50 p-6 md:p-8">
             
-            {/* LEFT SIDEBAR (Glass Effect) */}
-            <div className="w-64 border-r border-gray-100/50 bg-white/30 p-6 flex flex-col justify-between hidden lg:flex">
+            {/* Topbar / Welcome Message */}
+            <div className="flex justify-between items-center mb-8 shrink-0">
               <div>
-                <div className="flex items-center gap-2.5 mb-12 px-2">
-                  <div className="w-8 h-8 bg-gradient-to-br from-primary to-cyan-500 rounded-lg flex items-center justify-center shadow-sm">
-                    <Activity className="text-white w-4 h-4" />
-                  </div>
-                  <span className="text-lg font-bold tracking-tight text-gray-900 font-satoshi">EIOHealth</span>
-                </div>
-
-                <nav className="space-y-2">
-                  {[
-                    { name: "Overview", icon: <LayoutDashboard className="w-4 h-4" />, active: true },
-                    { name: "Chat History", icon: <MessageSquare className="w-4 h-4" />, active: false },
-                    { name: "Faskes Tracker", icon: <MapPin className="w-4 h-4" />, active: false },
-                    { name: "Jurnal Disimpan", icon: <BookMarked className="w-4 h-4" />, active: false },
-                  ].map((item, i) => (
-                    <div key={i} className={`flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all duration-300 ${item.active ? 'bg-white shadow-sm border border-gray-100 text-primary font-bold' : 'text-gray-500 hover:bg-white/50 hover:text-gray-900 font-medium'}`}>
-                      {item.icon}
-                      <span className="text-sm font-inter">{item.name}</span>
-                    </div>
-                  ))}
-                </nav>
+                <h3 className="text-2xl font-black text-slate-900 font-satoshi flex items-center gap-2">
+                  Selamat datang kembali, Kamal <span className="text-xl">👋</span>
+                </h3>
+                <p className="text-sm text-slate-500 font-inter mt-1">Pusat kontrol kesehatan digital Anda siap digunakan.</p>
               </div>
-
-              <div className="space-y-2">
-                <div className="flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer text-gray-500 hover:bg-white/50 transition-all font-medium">
-                  <Settings className="w-4 h-4" />
-                  <span className="text-sm font-inter">Pengaturan</span>
+              <div className="hidden md:flex items-center gap-4">
+                <div className="w-10 h-10 bg-white rounded-full border border-slate-200 flex items-center justify-center text-slate-600 shadow-sm">
+                  <Bell className="w-4 h-4" />
                 </div>
-                {/* User Profile Snippet */}
-                <div className="flex items-center gap-3 px-4 py-3 mt-4 border-t border-gray-100/50 pt-6">
-                  <div className="w-9 h-9 rounded-full bg-gray-900 text-white flex items-center justify-center font-bold text-xs">
-                    KI
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-sm font-bold text-gray-900 font-satoshi">Kamal Ilham</span>
-                    <span className="text-[10px] font-medium text-gray-500">Pharmacist</span>
+                <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-full border border-slate-200 shadow-sm">
+                  <span className="text-sm font-bold text-slate-800">Kamal</span>
+                  <div className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
+                    <User className="w-3 h-3" />
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* RIGHT ANALYTICS CONTENT */}
-            <div className="flex-1 bg-gradient-to-br from-transparent to-gray-50/30 p-8 overflow-y-auto custom-scrollbar">
+            {/* OVERVIEW STATS CARDS */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 shrink-0">
+              {/* Card 1 */}
+              <div className="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h2 className="text-4xl font-black text-slate-900 mb-2">12</h2>
+                    <p className="text-sm font-bold text-slate-600">Total Artikel Edukasi</p>
+                    <p className="text-[11px] text-slate-400 mt-1">Siap dibaca</p>
+                  </div>
+                  <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600">
+                    <BookOpen className="w-5 h-5" />
+                  </div>
+                </div>
+              </div>
               
-              {/* Topbar */}
-              <div className="flex justify-between items-center mb-10">
-                <div>
-                  <h3 className="text-2xl font-extrabold text-gray-900 font-satoshi">Halo, Kamal!</h3>
-                  <p className="text-sm text-gray-500 font-inter">Berikut adalah ringkasan kesehatan Anda minggu ini.</p>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="relative hidden md:block">
-                    <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                    <input type="text" placeholder="Cari rekam medis..." className="pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-inter focus:outline-none focus:border-primary w-64 shadow-sm" />
+              {/* Card 2 */}
+              <div className="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h2 className="text-4xl font-black text-slate-900 mb-2">6</h2>
+                    <p className="text-sm font-bold text-slate-600">Kategori Pembahasan</p>
+                    <p className="text-[11px] text-slate-400 mt-1">Topik kesehatan</p>
                   </div>
-                  <button className="w-10 h-10 bg-white rounded-full border border-gray-200 flex items-center justify-center relative shadow-sm hover:border-primary/50 transition-colors">
-                    <Bell className="w-4 h-4 text-gray-600" />
-                    <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white" />
-                  </button>
+                  <div className="w-12 h-12 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-500">
+                    <Activity className="w-5 h-5" />
+                  </div>
                 </div>
               </div>
 
-              {/* METRICS ROW */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                {/* Health Score */}
-                <motion.div whileHover={{ y: -5 }} className="bg-white p-6 rounded-3xl border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.02)] relative overflow-hidden group transition-all">
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-bl-full -z-10 group-hover:scale-110 transition-transform" />
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center">
-                      <Activity className="w-5 h-5 text-indigo-500" />
-                    </div>
-                    <span className="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Health Score</span>
+              {/* Card 3 (Map) */}
+              <div className="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h2 className="text-4xl font-black text-slate-900 mb-2">Peta</h2>
+                    <p className="text-sm font-bold text-slate-600">Cari Fasilitas Medis</p>
+                    <p className="text-[11px] text-slate-400 mt-1">Temukan apotek & klinik terdekat.</p>
                   </div>
-                  <div className="text-4xl font-black text-gray-900 font-satoshi mb-1">92<span className="text-lg text-gray-400 font-medium">/100</span></div>
-                  <div className="text-xs font-semibold text-emerald-500 flex items-center gap-1">
-                    <TrendingUp className="w-3 h-3" /> +4.2% Kondisi Optimal
+                  <div className="w-12 h-12 bg-cyan-50 rounded-2xl flex items-center justify-center text-cyan-600">
+                    <MapPin className="w-5 h-5" />
                   </div>
-                </motion.div>
-
-                {/* Heart Rate */}
-                <motion.div whileHover={{ y: -5 }} className="bg-white p-6 rounded-3xl border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.02)] relative overflow-hidden group transition-all">
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center">
-                      <HeartPulse className="w-5 h-5 text-red-500" />
-                    </div>
-                    <span className="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Detak Jantung</span>
-                  </div>
-                  <div className="text-4xl font-black text-gray-900 font-satoshi mb-1">72<span className="text-lg text-gray-400 font-medium"> bpm</span></div>
-                  <div className="text-xs font-semibold text-gray-500">Rata-rata saat istirahat</div>
-                </motion.div>
-
-                {/* Consultations */}
-                <motion.div whileHover={{ y: -5 }} className="bg-gradient-to-br from-gray-900 to-gray-800 p-6 rounded-3xl shadow-[0_15px_40px_rgba(0,0,0,0.1)] text-white relative overflow-hidden group transition-all">
-                  <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-white/5 rounded-full blur-xl group-hover:bg-white/10 transition-colors" />
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/10">
-                      <Bot className="w-5 h-5 text-cyan-400" />
-                    </div>
-                    <span className="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Sesi AI</span>
-                  </div>
-                  <div className="text-4xl font-black font-satoshi mb-1">12<span className="text-lg text-gray-400 font-medium"> sesi</span></div>
-                  <div className="text-xs font-medium text-cyan-400 flex items-center gap-1">
-                    Bulan ini
-                  </div>
-                </motion.div>
+                </div>
               </div>
+            </div>
 
-              {/* BOTTOM ROW: CHART & HISTORY */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                
-                {/* Animated Chart Card */}
-                <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.02)]">
-                  <div className="flex justify-between items-center mb-8">
-                    <h4 className="font-bold text-gray-900 font-satoshi">Aktivitas Mingguan</h4>
-                    <span className="text-xs font-bold text-primary bg-primary/10 px-3 py-1.5 rounded-full">Detail</span>
+            {/* SPLIT CONTENT AREA */}
+            <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-0">
+              
+              {/* LEFT: AI CHAT PANEL (col-span-2) */}
+              <div className="lg:col-span-2 bg-white/80 backdrop-blur-xl border border-white p-5 rounded-[28px] shadow-[0_8px_30px_rgba(0,0,0,0.03)] flex flex-col h-full">
+                {/* Header Chat */}
+                <div className="flex items-center justify-between mb-4 shrink-0 relative px-2">
+                  <div className="flex items-center gap-2 z-10">
+                    <div className="w-2.5 h-2.5 rounded-full bg-rose-400"></div>
+                    <div className="w-2.5 h-2.5 rounded-full bg-amber-400"></div>
+                    <div className="w-2.5 h-2.5 rounded-full bg-emerald-400"></div>
                   </div>
-                  <div className="h-48 flex items-end justify-between gap-2 md:gap-4 px-2">
-                    {[35, 50, 40, 85, 60, 45, 70].map((height, i) => (
-                      <div key={i} className="w-full flex flex-col items-center gap-3">
-                        <div className="w-full h-full bg-gray-50 rounded-t-xl flex items-end relative group cursor-pointer overflow-hidden">
-                          <motion.div 
-                            initial={{ height: 0 }} whileInView={{ height: `${height}%` }} viewport={{ once: true }} transition={{ duration: 1, delay: i * 0.1, ease: "easeOut" }}
-                            className={`w-full rounded-t-xl ${i === 3 ? 'bg-gradient-to-t from-primary to-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.4)]' : 'bg-gray-200 group-hover:bg-gray-300'} transition-colors`}
-                          />
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="flex items-center gap-1.5 text-slate-400 font-bold text-[10px] tracking-widest uppercase">
+                      <Shield className="w-3.5 h-3.5" /> AI ASSISTANT
+                    </div>
+                  </div>
+                </div>
+
+                {/* Area Chat */}
+                <div className="flex-1 overflow-y-auto space-y-4 px-2 no-scrollbar flex flex-col justify-end min-h-0">
+                  {/* User Bubble */}
+                  <div className="flex justify-end">
+                    <div className="bg-[#0F172A] text-white text-xs px-5 py-3.5 rounded-[20px] rounded-tr-sm shadow-md max-w-[85%] font-medium leading-relaxed">
+                      Saya diresepkan antibiotik Amoxicillin, tapi saya juga sedang rutin minum antasida untuk lambung. Apakah boleh diminum bersamaan?
+                    </div>
+                  </div>
+
+                  {/* AI Bubble */}
+                  <div className="flex justify-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center shrink-0 shadow-sm mt-1">
+                      <Sparkles className="w-4 h-4 text-white" />
+                    </div>
+                    <div className="bg-white border border-slate-200 p-4 rounded-[20px] rounded-tl-sm shadow-sm max-w-[90%]">
+                      <p className="text-slate-700 text-xs leading-relaxed mb-3">
+                        Sebaiknya <span className="font-bold text-indigo-600">jangan diminum bersamaan</span>. Antasida mengandung magnesium/aluminium yang dapat mengikat antibiotik di lambung.
+                      </p>
+                      <div className="bg-indigo-50/50 border border-indigo-100 p-3 rounded-xl flex gap-2">
+                        <Activity className="w-4 h-4 text-indigo-600 shrink-0 mt-0.5" />
+                        <div>
+                          <h4 className="text-[11px] font-bold text-slate-900 mb-0.5">Rekomendasi Farmasi:</h4>
+                          <p className="text-[11px] text-slate-600 leading-relaxed">
+                            Beri jeda minimal <b>2 jam</b> antara minum antasida dan antibiotik.
+                          </p>
                         </div>
-                        <span className="text-[10px] font-bold text-gray-400">{['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'][i]}</span>
                       </div>
-                    ))}
+                    </div>
                   </div>
                 </div>
 
-                {/* AI History & Saved Items */}
-                <div className="flex flex-col gap-6">
-                  {/* History List */}
-                  <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.02)] flex-1">
-                    <h4 className="font-bold text-gray-900 font-satoshi mb-5">Riwayat Konsultasi</h4>
-                    <div className="space-y-4">
-                      {[
-                        { title: "Analisis Interaksi Farmakologis", time: "Hari ini, 09:40", tag: "Selesai" },
-                        { title: "Gejala Sindrom Dispepsia", time: "Kemarin, 14:20", tag: "Selesai" }
-                      ].map((item, i) => (
-                        <div key={i} className="flex items-center justify-between p-3 rounded-2xl hover:bg-gray-50 border border-transparent hover:border-gray-100 transition-colors cursor-pointer group">
-                          <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 rounded-full bg-cyan-50 flex items-center justify-center text-cyan-600">
-                              <MessageSquare className="w-4 h-4" />
-                            </div>
-                            <div>
-                              <div className="text-sm font-bold text-gray-900 font-satoshi group-hover:text-primary transition-colors">{item.title}</div>
-                              <div className="text-[11px] text-gray-500 font-inter">{item.time}</div>
-                            </div>
-                          </div>
-                          <ArrowUpRight className="w-4 h-4 text-gray-300 group-hover:text-primary transition-colors" />
+                {/* Input Bar */}
+                <div className="mt-4 shrink-0 px-1">
+                  <div className="w-full flex items-center bg-slate-50 border border-slate-200 rounded-full py-1.5 px-2 text-sm">
+                    <div className="p-2 text-slate-400"><Plus className="w-4 h-4" /></div>
+                    <span className="flex-1 px-2 text-xs text-slate-400 font-medium">Mulai Konsultasi...</span>
+                    <div className="p-2 text-slate-400 mr-1"><Mic className="w-4 h-4" /></div>
+                    <div className="p-2 bg-slate-900 text-white rounded-full"><Send className="w-3.5 h-3.5 ml-0.5" /></div>
+                  </div>
+                </div>
+              </div>
+
+              {/* RIGHT: TERAKHIR DIBACA (col-span-1) */}
+              <div className="bg-white/80 backdrop-blur-xl border border-white p-5 rounded-[28px] shadow-[0_8px_30px_rgba(0,0,0,0.03)] flex flex-col h-full overflow-hidden hidden lg:flex">
+                <div className="flex items-center justify-between mb-4 shrink-0">
+                  <h3 className="text-base font-black text-slate-900">Terakhir Dibaca</h3>
+                  <span className="text-[10px] font-bold text-indigo-600 flex items-center gap-1 cursor-pointer">
+                    Lihat Semua <Search className="w-3 h-3" />
+                  </span>
+                </div>
+
+                <div className="flex-1 overflow-y-auto space-y-3 no-scrollbar min-h-0">
+                  {[1, 2].map((i) => (
+                    <div key={i} className="block p-3 rounded-2xl bg-white border border-slate-100 shadow-sm hover:border-indigo-100 transition-colors">
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 rounded-xl bg-indigo-50 flex items-center justify-center shrink-0">
+                          <BookMarked className="w-3.5 h-3.5 text-indigo-600" />
                         </div>
-                      ))}
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[10px] font-bold text-indigo-600 mb-0.5 truncate">Penyakit Menular</p>
+                          <h4 className="text-xs font-bold text-slate-900 leading-snug line-clamp-2">
+                            {i === 1 ? "Mengenal Penyakit Menular dan Pencegahannya" : "Panduan Dasar P3K di Rumah"}
+                          </h4>
+                          <p className="text-[9px] text-slate-500 mt-1 font-medium">31 Mei 2026</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="shrink-0 mt-3">
+                  <div className="flex items-center gap-3 p-3 rounded-2xl bg-indigo-50 border border-indigo-100 cursor-pointer">
+                    <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center shrink-0">
+                      <Search className="w-3.5 h-3.5 text-white" />
+                    </div>
+                    <div>
+                      <h4 className="text-[11px] font-bold text-indigo-900">Cari Artikel</h4>
+                      <p className="text-[9px] text-indigo-700 mt-0.5">Temukan Artikel terbaru.</p>
                     </div>
                   </div>
                 </div>
 
               </div>
+
             </div>
           </div>
         </motion.div>

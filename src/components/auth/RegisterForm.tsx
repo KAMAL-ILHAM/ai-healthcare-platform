@@ -86,7 +86,7 @@ export default function RegisterForm() {
                 <User className="h-5 w-5 text-gray-400 group-focus-within:text-cyan-600 transition-colors" />
               </div>
               <input
-                type="text" required placeholder="Kamal Ilham"
+                type="text" required placeholder="Nama"
                 value={name} onChange={(e) => setName(e.target.value)}
                 className="w-full pl-11 pr-4 py-3 bg-white/40 border border-white/60 rounded-xl text-sm focus:outline-none focus:bg-white/80 focus:ring-4 focus:ring-cyan-500/10 focus:border-cyan-500 transition-all placeholder:text-gray-400 text-gray-900 font-medium shadow-sm"
               />
@@ -100,7 +100,7 @@ export default function RegisterForm() {
                 <Mail className="h-5 w-5 text-gray-400 group-focus-within:text-cyan-600 transition-colors" />
               </div>
               <input
-                type="email" required placeholder="pharmacist@eiohealth.com"
+                type="email" required placeholder="user123@gmail.com"
                 value={email} onChange={(e) => setEmail(e.target.value)}
                 className="w-full pl-11 pr-4 py-3 bg-white/40 border border-white/60 rounded-xl text-sm focus:outline-none focus:bg-white/80 focus:ring-4 focus:ring-cyan-500/10 focus:border-cyan-500 transition-all placeholder:text-gray-400 text-gray-900 font-medium shadow-sm"
               />

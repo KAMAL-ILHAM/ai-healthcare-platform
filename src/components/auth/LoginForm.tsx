@@ -73,7 +73,7 @@ export default function LoginForm() {
                 <Mail className="h-5 w-5 text-gray-400 group-focus-within:text-indigo-600 transition-colors" />
               </div>
               <input
-                type="email" required placeholder="pharmacist@eiohealth.com"
+                type="email" required placeholder="user123@gmail.com"
                 value={email} onChange={(e) => setEmail(e.target.value)}
                 className="w-full pl-11 pr-4 py-3.5 bg-white/40 border border-white/60 rounded-xl text-sm focus:outline-none focus:bg-white/80 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all placeholder:text-gray-400 text-gray-900 font-medium shadow-sm"
               />
