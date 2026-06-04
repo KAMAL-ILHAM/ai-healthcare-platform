@@ -41,9 +41,7 @@ EIO Health adalah platform kesehatan digital komprehensif yang menyediakan layan
 * PostgreSQL (Neon Database)
 
 ### Artificial Intelligence
-* Vercel AI SDK
 * Groq API
-* OpenAI API
 
 ### Authentication & Security
 * JSON Web Token (JWT)
