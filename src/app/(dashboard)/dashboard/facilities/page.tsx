@@ -14,10 +14,10 @@ const MapComponent = dynamic(() => import('./MapComponent'), {
   ssr: false,
   loading: () => (
     <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-50 z-10">
-      <div className="p-6 bg-white/80 backdrop-blur-md rounded-2xl border border-indigo-100 shadow-lg flex flex-col items-center text-center">
-        <MapPin className="w-10 h-10 text-indigo-500 mb-3 animate-bounce" />
-        <h3 className="font-bold text-slate-800 mb-1">Memuat Peta Interaktif...</h3>
-        <p className="text-sm text-slate-500">Menghubungkan ke satelit OpenStreetMap</p>
+      <div className="p-4 md:p-6 bg-white/80 backdrop-blur-md rounded-[20px] md:rounded-2xl border border-indigo-100 shadow-lg flex flex-col items-center text-center mx-4">
+        <MapPin className="w-8 h-8 md:w-10 md:h-10 text-indigo-500 mb-2 md:mb-3 animate-bounce" />
+        <h3 className="font-bold text-sm md:text-base text-slate-800 mb-1">Memuat Peta Interaktif...</h3>
+        <p className="text-xs md:text-sm text-slate-500">Menghubungkan ke satelit OpenStreetMap</p>
       </div>
     </div>
   ),
@@ -182,12 +182,10 @@ export default function FacilitiesPage() {
 
   useEffect(() => { fetchFacilities(currentLocation); }, [currentLocation, fetchFacilities]);
 
-  // --- CORES: FUNGSI TRIGGER PENCARI JALAN RAYA ---
   const handleSelectFacility = useCallback((facility: Facility) => {
     setSelectedFacilityId(facility.id);
     setMapCenter({ lat: facility.lat, lng: facility.lon });
     
-    // Hitung rute jalan raya real dari titik pin pencarian awal
     const fetchRouteLine = async (start: Location, end: Facility) => {
       try {
         setRouteInfo(null);
@@ -246,55 +244,76 @@ export default function FacilitiesPage() {
   }, []);
 
   return (
-    <div className="fixed inset-0 z-[9999] bg-[#f8fafc] font-sans text-slate-800 flex flex-col overflow-hidden">
+    <div className="fixed inset-0 z-[9999] bg-[#f8fafc] font-sans text-slate-800 flex flex-col overflow-hidden pb-16 md:pb-0">
       
       <div className="absolute inset-0 pointer-events-none z-0" style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.03), rgba(6,182,212,0.03))' }}>
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:32px_32px]"></div>
       </div>
 
+      {/* --- KAPSUL HEADER --- */}
       <div className="absolute top-0 w-full p-4 md:p-6 flex items-center justify-between z-50 pointer-events-none">
-        <div className="text-[14px] font-bold text-slate-700 pointer-events-auto bg-white/90 px-6 py-2.5 rounded-full backdrop-blur-md border border-slate-200/60 shadow-sm tracking-wide flex items-center gap-2">
-          <Bot className="w-4 h-4 text-indigo-600" />
-          FASKES
+        
+        {/* Label Kiri */}
+        <div className="text-[12px] md:text-[14px] font-bold text-slate-700 pointer-events-auto bg-white/90 px-4 py-2 md:px-6 md:py-2.5 rounded-full backdrop-blur-md border border-slate-200/60 shadow-sm tracking-wide flex items-center gap-2">
+          <Bot className="w-3.5 h-3.5 md:w-4 md:h-4 text-indigo-600" />
+          <span className="hidden sm:inline">FASKES</span>
+          <span className="sm:hidden">PETA</span>
         </div>
-        <button onClick={() => router.push('/dashboard')} className="pointer-events-auto flex items-center gap-2.5 px-5 py-2.5 bg-white/90 backdrop-blur-md border border-slate-200/60 hover:border-indigo-300 text-slate-600 hover:text-indigo-600 hover:bg-white rounded-full shadow-sm transition-all duration-200 text-[13px] font-semibold">
-          <Home className="w-4 h-4" />
-          <span className="hidden sm:inline">Dashboard</span>
-        </button>
+        
+        {/* Grup Tombol Kanan */}
+        <div className="flex items-center gap-2 pointer-events-auto">
+          
+          {/* 🌟 TOMBOL DARURAT KHUSUS HP (Sembunyi di Laptop) */}
+          <button
+            onClick={() => setIsEmergencyModalOpen(true)}
+            className="md:hidden flex items-center justify-center w-9 h-9 bg-rose-50/90 backdrop-blur-md border border-rose-200 text-rose-600 rounded-full shadow-sm hover:bg-rose-100 transition-all"
+            title="Panggilan Darurat"
+          >
+            <Phone className="w-4 h-4" />
+          </button>
+
+          {/* Tombol Home Dashboard */}
+          <button onClick={() => router.push('/dashboard')} className="flex items-center gap-2 px-4 py-2 md:px-5 md:py-2.5 bg-white/90 backdrop-blur-md border border-slate-200/60 hover:border-indigo-300 text-slate-600 hover:text-indigo-600 hover:bg-white rounded-full shadow-sm transition-all duration-200 text-[12px] md:text-[13px] font-semibold">
+            <Home className="w-3.5 h-3.5 md:w-4 md:h-4" />
+            <span className="hidden sm:inline">Dashboard</span>
+          </button>
+
+        </div>
       </div>
 
-      <div className="flex-1 flex flex-col md:flex-row gap-6 p-4 md:p-6 pt-20 md:pt-24 relative z-10 overflow-hidden">
+      <div className="flex-1 flex flex-col md:flex-row gap-3 md:gap-6 p-3 md:p-6 pt-20 md:pt-24 relative z-10 overflow-y-auto md:overflow-hidden scrollbar-thin">
         
-        {/* KOLOM KIRI */}
-        <div className="flex-1 flex flex-col gap-4 h-full min-w-0">
+        {/* KOLOM KIRI (Pencarian & Map) */}
+        <div className="flex flex-col gap-3 md:gap-4 w-full md:flex-1 h-[450px] md:h-full shrink-0">
+          
           <form onSubmit={handleSearchLocation} className="relative w-full shadow-sm rounded-xl bg-white border border-slate-200 focus-within:ring-2 ring-indigo-500/20 focus-within:border-indigo-400 transition-all shrink-0">
-            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-              {isSearchingLocation ? <Loader2 className="h-5 w-5 text-indigo-500 animate-spin" /> : <Search className="h-5 w-5 text-slate-400" />}
+            <div className="absolute inset-y-0 left-0 pl-3 md:pl-4 flex items-center pointer-events-none">
+              {isSearchingLocation ? <Loader2 className="h-4 w-4 md:h-5 md:w-5 text-indigo-500 animate-spin" /> : <Search className="h-4 w-4 md:h-5 md:w-5 text-slate-400" />}
             </div>
             <input
               type="text" 
-              placeholder="Ketik nama kota atau daerah (Contoh: Balikpapan)... lalu Enter"
+              placeholder="Cari lokasi (cth: Balikpapan)..."
               value={searchQuery} 
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-11 pr-4 py-3 bg-transparent border-none text-[14px] font-medium text-slate-800 placeholder:text-slate-400 focus:outline-none"
+              className="w-full pl-10 pr-3 py-2.5 md:pl-11 md:pr-4 md:py-3 bg-transparent border-none text-[13px] md:text-[14px] font-medium text-slate-800 placeholder:text-slate-400 focus:outline-none"
             />
           </form>
 
-          <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1 shrink-0">
+          <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1 shrink-0 snap-x">
             {categories.map((cat) => (
-              <button key={cat} onClick={() => setActiveCategory(cat)} className={`whitespace-nowrap px-4 py-2 rounded-lg text-[13px] font-semibold transition-all shadow-sm border ${activeCategory === cat ? 'bg-slate-800 text-white border-transparent' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:border-indigo-200 hover:text-indigo-600'}`}>
+              <button key={cat} onClick={() => setActiveCategory(cat)} className={`snap-start whitespace-nowrap px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-[12px] md:text-[13px] font-semibold transition-all shadow-sm border ${activeCategory === cat ? 'bg-slate-800 text-white border-transparent' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:border-indigo-200 hover:text-indigo-600'}`}>
                 {cat}
               </button>
             ))}
           </div>
 
-          <div className="flex-1 rounded-2xl bg-white border border-slate-200 shadow-sm overflow-hidden relative z-0">
+          <div className="flex-1 rounded-[20px] md:rounded-2xl bg-white border border-slate-200 shadow-sm overflow-hidden relative z-0 h-full">
              <MapComponent 
                currentLocation={currentLocation}
                mapCenter={mapCenter} 
                facilities={filteredFacilities} 
                routePolyline={routePolyline}
-               onSelectFacility={handleSelectFacility} // Sambungkan aksi klik pin di map
+               onSelectFacility={handleSelectFacility}
                onMapClick={(lat, lng) => {
                  const newLoc = { lat, lng };
                  setCurrentLocation(newLoc);
@@ -308,98 +327,100 @@ export default function FacilitiesPage() {
              <button
                onClick={handleLocateMe}
                disabled={isLocating}
-               className="absolute bottom-6 right-4 z-[400] w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center border border-slate-100 hover:bg-slate-50 hover:text-indigo-600 transition-all text-slate-700 disabled:opacity-70"
+               className="absolute bottom-4 right-4 md:bottom-6 md:right-4 z-[400] w-10 h-10 md:w-12 md:h-12 bg-white rounded-full shadow-lg flex items-center justify-center border border-slate-100 hover:bg-slate-50 hover:text-indigo-600 transition-all text-slate-700 disabled:opacity-70"
                title="Kembali ke Lokasi Saya"
              >
-               {isLocating ? <Loader2 className="w-5 h-5 animate-spin text-indigo-600" /> : <Navigation className="w-5 h-5" />}
+               {isLocating ? <Loader2 className="w-4 h-4 md:w-5 md:h-5 animate-spin text-indigo-600" /> : <Navigation className="w-4 h-4 md:w-5 md:h-5" />}
              </button>
           </div>
         </div>
 
-        {/* KOLOM KANAN */}
-        <div className="w-full md:w-[380px] shrink-0 h-full flex flex-col gap-4">
-          <div className="rounded-2xl bg-gradient-to-br from-[#E11D48] to-[#BE123C] p-5 text-white shadow-md relative overflow-hidden shrink-0 border border-rose-800">
+        {/* KOLOM KANAN (List & Darurat) */}
+        <div className="w-full md:w-[380px] shrink-0 flex flex-col gap-3 md:gap-4 h-auto md:h-full">
+          
+          {/* 🌟 KOTAK DARURAT MERAH: Sembunyi di HP (hidden md:block) karena sudah dipindah ke Header */}
+          <div className="hidden md:block rounded-[20px] md:rounded-2xl bg-gradient-to-br from-[#E11D48] to-[#BE123C] p-4 md:p-5 text-white shadow-md relative overflow-hidden shrink-0 border border-rose-800">
             <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
-            <div className="relative z-10 flex gap-4 items-center">
-              <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center shrink-0 border border-white/20 shadow-sm">
-                <ShieldAlert className="w-6 h-6 text-white" />
+            <div className="relative z-10 flex gap-3 md:gap-4 items-center">
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-[10px] md:rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center shrink-0 border border-white/20 shadow-sm">
+                <ShieldAlert className="w-5 h-5 md:w-6 md:h-6 text-white" />
               </div>
               <div className="flex-1">
-                <h2 className="text-[16px] font-bold tracking-tight mb-0.5">Panggilan Darurat</h2>
-                <p className="text-rose-100 text-[12px] font-medium mb-3">Akses cepat siaga 24 Jam.</p>
-                <button onClick={() => setIsEmergencyModalOpen(true)} className="bg-white text-rose-600 text-[12px] font-bold px-3 py-2 rounded-lg hover:bg-rose-50 hover:shadow-sm transition-all flex items-center justify-center gap-2 w-full">
-                  <Phone className="w-3.5 h-3.5" /> Lihat Nomor Darurat
+                <h2 className="text-[14px] md:text-[16px] font-bold tracking-tight mb-0.5">Panggilan Darurat</h2>
+                <p className="text-rose-100 text-[11px] md:text-[12px] font-medium mb-2 md:mb-3">Akses cepat siaga 24 Jam.</p>
+                <button onClick={() => setIsEmergencyModalOpen(true)} className="bg-white text-rose-600 text-[11px] md:text-[12px] font-bold px-3 py-1.5 md:py-2 rounded-lg hover:bg-rose-50 hover:shadow-sm transition-all flex items-center justify-center gap-2 w-full">
+                  <Phone className="w-3 h-3 md:w-3.5 md:h-3.5" /> Nomor Darurat
                 </button>
               </div>
             </div>
           </div>
 
-          <div className="flex-1 flex flex-col rounded-2xl bg-white border border-slate-200 shadow-sm overflow-hidden p-1">
-            <div className="p-4 pb-2 shrink-0 border-b border-slate-100 mx-2 mb-2 flex justify-between items-center">
-              <h3 className="font-bold text-[15px] text-slate-800">Fasilitas Terdekat</h3>
+          {/* Kotak List Fasilitas (Di HP posisinya jadi langsung di bawah Peta) */}
+          <div className="flex-1 flex flex-col rounded-[20px] md:rounded-2xl bg-white border border-slate-200 shadow-sm overflow-hidden p-1 min-h-[300px] md:min-h-0">
+            <div className="p-3 pb-2 md:p-4 md:pb-2 shrink-0 border-b border-slate-100 mx-2 mb-2 flex justify-between items-center">
+              <h3 className="font-bold text-[14px] md:text-[15px] text-slate-800">Fasilitas Terdekat</h3>
               {isLoadingData && <Loader2 className="w-4 h-4 text-indigo-500 animate-spin" />}
             </div>
 
-            <div className="flex-1 overflow-y-auto px-3 space-y-2 scrollbar-thin scrollbar-thumb-slate-200 pb-2">
+            <div className="flex-1 overflow-y-auto px-2 md:px-3 space-y-2 scrollbar-thin scrollbar-thumb-slate-200 pb-2">
               {apiError && (
-                <div className="text-center p-5 bg-rose-50 rounded-xl border border-rose-100 mt-2">
-                  <AlertTriangle className="w-6 h-6 text-rose-500 mx-auto mb-2 opacity-80" />
-                  <p className="text-[13px] text-rose-700 font-medium leading-relaxed">{apiError}</p>
+                <div className="text-center p-4 bg-rose-50 rounded-xl border border-rose-100 mt-2 mx-1">
+                  <AlertTriangle className="w-5 h-5 md:w-6 md:h-6 text-rose-500 mx-auto mb-2 opacity-80" />
+                  <p className="text-[12px] md:text-[13px] text-rose-700 font-medium leading-relaxed">{apiError}</p>
                 </div>
               )}
 
               {!isLoadingData && !apiError && filteredFacilities.length === 0 && (
-                <div className="text-center p-6 text-sm text-slate-400">Tidak ada fasilitas ditemukan dalam radius 3 KM.</div>
+                <div className="text-center p-6 text-xs md:text-sm text-slate-400">Tidak ada fasilitas ditemukan dalam radius 10 KM.</div>
               )}
 
               {filteredFacilities.slice(0, 5).map((facility) => (
                 <div 
                   key={facility.id} 
                   onClick={() => handleSelectFacility(facility)}
-                  className={`flex gap-3 items-center p-2 rounded-xl transition-all border cursor-pointer ${
+                  className={`flex gap-2 md:gap-3 items-center p-2 rounded-xl transition-all border cursor-pointer ${
                     selectedFacilityId === facility.id ? 'bg-indigo-50/70 border-indigo-200 shadow-sm' : 'hover:bg-slate-50 border-transparent hover:border-slate-200 bg-white/40'
                   }`}
                 >
-                  <div className="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center shrink-0 border border-indigo-100">
-                    {facility.category === 'Rumah Sakit' ? <Building2 className="w-5 h-5 text-indigo-500" /> : 
-                     facility.category === 'Apotek' ? <Activity className="w-5 h-5 text-emerald-500" /> : 
-                     <Bot className="w-5 h-5 text-cyan-500"/>}
+                  <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg bg-indigo-50 flex items-center justify-center shrink-0 border border-indigo-100">
+                    {facility.category === 'Rumah Sakit' ? <Building2 className="w-4 h-4 md:w-5 md:h-5 text-indigo-500" /> : 
+                     facility.category === 'Apotek' ? <Activity className="w-4 h-4 md:w-5 md:h-5 text-emerald-500" /> : 
+                     <Bot className="w-4 h-4 md:w-5 md:h-5 text-cyan-500"/>}
                   </div>
-                  <div className="flex-1 min-w-0 flex items-center justify-between gap-2">
+                  <div className="flex-1 min-w-0 flex items-center justify-between gap-1 md:gap-2">
                     <div className="flex-1 min-w-0">
-                      <h4 className="text-[13px] font-bold text-slate-800 truncate">{facility.name}</h4>
-                      <div className="flex items-center gap-2 mt-1 text-[11px] font-medium text-slate-500">
-                        <span className="text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded-md border border-indigo-100">{facility.category}</span>
+                      <h4 className="text-[12px] md:text-[13px] font-bold text-slate-800 truncate">{facility.name}</h4>
+                      <div className="flex items-center gap-1.5 md:gap-2 mt-0.5 md:mt-1 text-[10px] md:text-[11px] font-medium text-slate-500">
+                        <span className="text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded md border border-indigo-100">{facility.category}</span>
                         <span className="flex items-center gap-1">
-                          <MapPin className="w-3 h-3" />
+                          <MapPin className="w-2.5 h-2.5 md:w-3 md:h-3" />
                           {selectedFacilityId === facility.id && routeInfo ? routeInfo.distance : facility.distance + ' KM'}
                         </span>
                       </div>
                       {selectedFacilityId === facility.id && routeInfo && (
-                        <div className="mt-2 flex items-center gap-1.5">
-                          <span className="text-white bg-indigo-600 px-2 py-0.5 rounded md font-bold text-[10px] flex items-center gap-1 shadow-sm">
-                            <Car className="w-3 h-3" /> {routeInfo.duration}
+                        <div className="mt-1.5 flex items-center gap-1.5">
+                          <span className="text-white bg-indigo-600 px-1.5 md:px-2 py-0.5 rounded md font-bold text-[9px] md:text-[10px] flex items-center gap-1 shadow-sm">
+                            <Car className="w-2.5 h-2.5 md:w-3 md:h-3" /> {routeInfo.duration}
                           </span>
                         </div>
                       )}
                     </div>
 
-                    {/* IKON PANAH NAVIGASI DI SEBELAH KANAN CARD */}
-                    <div className={`p-2 rounded-lg border transition-all ${
+                    <div className={`p-1.5 md:p-2 rounded-lg border transition-all ${
                       selectedFacilityId === facility.id 
                         ? 'bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-500/20' 
                         : 'bg-slate-50 text-slate-400 border-slate-100 group-hover:text-indigo-600'
                     }`}>
-                      <Navigation className={`w-4 h-4 transform rotate-45 ${selectedFacilityId === facility.id ? 'fill-white' : ''}`} />
+                      <Navigation className={`w-3.5 h-3.5 md:w-4 md:h-4 transform rotate-45 ${selectedFacilityId === facility.id ? 'fill-white' : ''}`} />
                     </div>
                   </div>
                 </div>
               ))}
             </div>
 
-            <div className="p-3 pt-2 shrink-0 border-t border-slate-100">
-              <button onClick={() => setIsAllFacilitiesModalOpen(true)} className="w-full flex items-center justify-center gap-2 py-2.5 bg-slate-50 border border-slate-200 text-slate-700 hover:text-indigo-600 hover:bg-white hover:border-indigo-200 rounded-lg text-[13px] font-semibold transition-all shadow-sm">
-                Lihat Semua Fasilitas <ArrowRight className="w-4 h-4" />
+            <div className="p-2 pt-2 md:p-3 md:pt-2 shrink-0 border-t border-slate-100">
+              <button onClick={() => setIsAllFacilitiesModalOpen(true)} className="w-full flex items-center justify-center gap-1.5 py-2 md:py-2.5 bg-slate-50 border border-slate-200 text-slate-700 hover:text-indigo-600 hover:bg-white hover:border-indigo-200 rounded-lg text-[12px] md:text-[13px] font-semibold transition-all shadow-sm">
+                Lihat Semua <ArrowRight className="w-3.5 h-3.5 md:w-4 md:h-4" />
               </button>
             </div>
           </div>
@@ -409,21 +430,21 @@ export default function FacilitiesPage() {
       {/* --- MODAL DARURAT --- */}
       <AnimatePresence>
         {isEmergencyModalOpen && (
-          <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsEmergencyModalOpen(false)} className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" />
-            <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="w-full max-w-md bg-white rounded-2xl shadow-xl relative z-10 overflow-hidden border border-slate-200">
-              <div className="bg-rose-50 border-b border-rose-100 p-5 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-white border border-rose-200 text-rose-600 flex items-center justify-center shadow-sm"><Phone className="w-5 h-5" /></div>
-                  <div><h3 className="font-bold text-[15px] text-slate-900">Nomor Darurat Samarinda</h3><p className="text-[12px] font-medium text-slate-600">Siaga 24 Jam</p></div>
+            <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="w-full max-w-md bg-white rounded-2xl md:rounded-[24px] shadow-xl relative z-10 overflow-hidden border border-slate-200">
+              <div className="bg-rose-50 border-b border-rose-100 p-4 md:p-5 flex items-center justify-between">
+                <div className="flex items-center gap-2 md:gap-3">
+                  <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-white border border-rose-200 text-rose-600 flex items-center justify-center shadow-sm"><Phone className="w-4 h-4 md:w-5 md:h-5" /></div>
+                  <div><h3 className="font-bold text-[13px] md:text-[15px] text-slate-900">Nomor Darurat</h3><p className="text-[10px] md:text-[12px] font-medium text-slate-600">Siaga 24 Jam</p></div>
                 </div>
-                <button onClick={() => setIsEmergencyModalOpen(false)} className="p-2 text-slate-400 hover:bg-rose-100 hover:text-rose-600 rounded-lg transition-colors"><X className="w-5 h-5" /></button>
+                <button onClick={() => setIsEmergencyModalOpen(false)} className="p-1.5 md:p-2 text-slate-400 hover:bg-rose-100 hover:text-rose-600 rounded-lg transition-colors"><X className="w-4 h-4 md:w-5 md:h-5" /></button>
               </div>
-              <div className="p-4 max-h-[60vh] overflow-y-auto space-y-2 bg-slate-50/50">
+              <div className="p-3 md:p-4 max-h-[60vh] overflow-y-auto space-y-1.5 md:space-y-2 bg-slate-50/50">
                 {emergencyContacts.map((contact) => (
-                  <div key={contact.id} className="flex items-center justify-between p-3.5 bg-white rounded-xl border border-slate-200 hover:border-rose-200 hover:shadow-sm transition-all group">
-                    <div><h4 className="text-[14px] font-bold text-slate-800">{contact.name}</h4><p className="text-[13px] font-semibold text-rose-600 mt-0.5">{contact.number}</p></div>
-                    <a href={`tel:${contact.number}`} className="w-9 h-9 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-600 group-hover:bg-rose-500 group-hover:text-white group-hover:border-rose-500 transition-all shadow-sm"><Phone className="w-4 h-4" /></a>
+                  <div key={contact.id} className="flex items-center justify-between p-3 md:p-3.5 bg-white rounded-xl border border-slate-200 hover:border-rose-200 hover:shadow-sm transition-all group">
+                    <div><h4 className="text-[13px] md:text-[14px] font-bold text-slate-800">{contact.name}</h4><p className="text-[12px] md:text-[13px] font-semibold text-rose-600 mt-0.5">{contact.number}</p></div>
+                    <a href={`tel:${contact.number}`} className="w-8 h-8 md:w-9 md:h-9 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-600 group-hover:bg-rose-500 group-hover:text-white group-hover:border-rose-500 transition-all shadow-sm"><Phone className="w-3.5 h-3.5 md:w-4 md:h-4" /></a>
                   </div>
                 ))}
               </div>
@@ -435,33 +456,33 @@ export default function FacilitiesPage() {
       {/* --- MODAL DAFTAR SEMUA FASILITAS --- */}
       <AnimatePresence>
         {isAllFacilitiesModalOpen && (
-          <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 md:p-8">
+          <div className="fixed inset-0 z-[99999] flex items-center justify-center p-3 sm:p-4 md:p-8">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsAllFacilitiesModalOpen(false)} className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" />
-            <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 30 }} className="w-full max-w-[900px] h-[85vh] bg-white rounded-2xl shadow-xl relative z-10 flex flex-col border border-slate-200 overflow-hidden">
-              <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between shrink-0 bg-white">
-                <div className="flex items-center gap-3">
-                  <h3 className="font-bold text-[16px] text-slate-800 tracking-tight">Data Fasilitas Real-Time</h3>
-                  {isLoadingData && <Loader2 className="w-4 h-4 text-indigo-500 animate-spin" />}
+            <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 30 }} className="w-full max-w-[900px] h-[90vh] md:h-[85vh] bg-white rounded-2xl md:rounded-[24px] shadow-xl relative z-10 flex flex-col border border-slate-200 overflow-hidden">
+              <div className="px-4 py-3 md:px-6 md:py-4 border-b border-slate-200 flex items-center justify-between shrink-0 bg-white">
+                <div className="flex items-center gap-2 md:gap-3">
+                  <h3 className="font-bold text-[14px] md:text-[16px] text-slate-800 tracking-tight">Data Fasilitas Real-Time</h3>
+                  {isLoadingData && <Loader2 className="w-3.5 h-3.5 md:w-4 md:h-4 text-indigo-500 animate-spin" />}
                 </div>
-                <button onClick={() => setIsAllFacilitiesModalOpen(false)} className="p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700 rounded-lg transition-colors"><X className="w-5 h-5" /></button>
+                <button onClick={() => setIsAllFacilitiesModalOpen(false)} className="p-1.5 md:p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700 rounded-lg transition-colors"><X className="w-4 h-4 md:w-5 md:h-5" /></button>
               </div>
-              <div className="p-5 shrink-0 bg-slate-50 border-b border-slate-200">
-                <div className="flex gap-2 overflow-x-auto no-scrollbar">
+              <div className="p-3 md:p-5 shrink-0 bg-slate-50 border-b border-slate-200">
+                <div className="flex gap-2 overflow-x-auto no-scrollbar snap-x">
                   {categories.map((cat) => (
-                    <button key={cat} onClick={() => setActiveCategory(cat)} className={`whitespace-nowrap px-4 py-1.5 rounded-lg text-[12px] font-semibold border ${activeCategory === cat ? 'bg-slate-800 text-white border-transparent shadow-sm' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100'}`}>{cat}</button>
+                    <button key={cat} onClick={() => setActiveCategory(cat)} className={`snap-start whitespace-nowrap px-3 py-1.5 md:px-4 md:py-1.5 rounded-lg text-[11px] md:text-[12px] font-semibold border ${activeCategory === cat ? 'bg-slate-800 text-white border-transparent shadow-sm' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100'}`}>{cat}</button>
                   ))}
                 </div>
               </div>
-              <div className="flex-1 overflow-y-auto p-5 bg-slate-50 scrollbar-thin scrollbar-thumb-slate-200">
+              <div className="flex-1 overflow-y-auto p-3 md:p-5 bg-slate-50 scrollbar-thin scrollbar-thumb-slate-200 pb-10">
                 
                 {apiError && (
-                  <div className="text-center p-5 bg-rose-50 rounded-xl border border-rose-100 mb-4">
-                    <AlertTriangle className="w-6 h-6 text-rose-500 mx-auto mb-2 opacity-80" />
-                    <p className="text-[13px] text-rose-700 font-medium leading-relaxed">{apiError}</p>
+                  <div className="text-center p-4 bg-rose-50 rounded-xl border border-rose-100 mb-4">
+                    <AlertTriangle className="w-5 h-5 text-rose-500 mx-auto mb-2 opacity-80" />
+                    <p className="text-[12px] text-rose-700 font-medium leading-relaxed">{apiError}</p>
                   </div>
                 )}
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
                   {filteredFacilities.map((facility) => (
                     <div 
                       key={facility.id} 
@@ -469,28 +490,28 @@ export default function FacilitiesPage() {
                         handleSelectFacility(facility);
                         setIsAllFacilitiesModalOpen(false); 
                       }}
-                      className={`border rounded-xl overflow-hidden hover:shadow-md transition-all group flex flex-col p-4 cursor-pointer bg-white ${
+                      className={`border rounded-xl overflow-hidden hover:shadow-md transition-all group flex flex-col p-3 md:p-4 cursor-pointer bg-white ${
                         selectedFacilityId === facility.id ? 'border-indigo-500 bg-indigo-50/10' : 'border-slate-200 hover:border-indigo-300'
                       }`}
                     >
-                      <div className="flex justify-between items-start mb-3">
-                        <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-100 px-1.5 py-0.5 rounded uppercase tracking-wider">{facility.category}</span>
+                      <div className="flex justify-between items-start mb-2 md:mb-3">
+                        <span className="text-[9px] md:text-[10px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-100 px-1.5 py-0.5 rounded uppercase tracking-wider">{facility.category}</span>
                       </div>
-                      <h4 className="text-[14px] font-bold text-slate-800 line-clamp-1 mb-1">{facility.name}</h4>
-                      <p className="text-[12px] font-medium text-slate-500 line-clamp-2 mb-3 h-8">{facility.address}</p>
+                      <h4 className="text-[13px] md:text-[14px] font-bold text-slate-800 line-clamp-1 mb-1">{facility.name}</h4>
+                      <p className="text-[11px] md:text-[12px] font-medium text-slate-500 line-clamp-2 mb-2 md:mb-3 h-8">{facility.address}</p>
                       
-                      <div className="mt-auto pt-3 border-t border-slate-100 flex items-center justify-between">
-                        <span className="text-[12px] font-bold text-slate-600 flex items-center gap-1.5">
-                          <Navigation className="w-3.5 h-3.5 text-indigo-500" /> 
+                      <div className="mt-auto pt-2.5 md:pt-3 border-t border-slate-100 flex items-center justify-between">
+                        <span className="text-[11px] md:text-[12px] font-bold text-slate-600 flex items-center gap-1 md:gap-1.5">
+                          <Navigation className="w-3 h-3 md:w-3.5 md:h-3.5 text-indigo-500" /> 
                           {selectedFacilityId === facility.id && routeInfo ? routeInfo.distance : facility.distance + ' KM'}
                         </span>
                         
                         {selectedFacilityId === facility.id && routeInfo ? (
-                          <span className="text-white bg-indigo-600 px-2 py-1 rounded-md font-bold text-[11px] flex items-center gap-1 shadow-sm">
-                            <Car className="w-3 h-3" /> {routeInfo.duration}
+                          <span className="text-white bg-indigo-600 px-1.5 md:px-2 py-0.5 md:py-1 rounded md font-bold text-[10px] md:text-[11px] flex items-center gap-1 shadow-sm">
+                            <Car className="w-2.5 h-2.5 md:w-3 md:h-3" /> {routeInfo.duration}
                           </span>
                         ) : (
-                          <span className="text-indigo-600 font-semibold text-[11px] group-hover:underline">Lihat Rute &rarr;</span>
+                          <span className="text-indigo-600 font-semibold text-[10px] md:text-[11px] group-hover:underline">Lihat Rute &rarr;</span>
                         )}
                       </div>
                     </div>

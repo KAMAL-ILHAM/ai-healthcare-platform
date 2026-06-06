@@ -10,7 +10,7 @@ import remarkGfm from 'remark-gfm';
 import {
   Send, Mic, Bot, MessageSquare, Loader2, AlertCircle,
   Home, Copy, RefreshCcw, Trash2, Check, FileText, Image as ImageIcon, X,
-  Activity, Plus, Search, History, Settings, Sparkles
+  Activity, Plus, Search, History, Settings, Sparkles, Menu // 🌟 Tambahan icon Menu
 } from 'lucide-react';
 import { getFriendlyChatError } from '@/lib/ai-errors';
 
@@ -39,12 +39,11 @@ function getMessageText(message: UIMessage): string {
     .join('');
 }
 
-// 🌟 KOMPONEN DESAIN MARKDOWN
 const MemoizedMarkdownComponents: any = {
-  p: ({ children }: any) => <p className="mb-4 last:mb-0 text-[15px] leading-relaxed text-slate-700 whitespace-pre-wrap">{children}</p>,
+  p: ({ children }: any) => <p className="mb-4 last:mb-0 text-[14px] md:text-[15px] leading-relaxed text-slate-700 whitespace-pre-wrap">{children}</p>,
   strong: ({ children }: any) => <strong className="font-bold text-slate-900">{children}</strong>,
-  ul: ({ children }: any) => <ul className="list-disc pl-5 mb-5 space-y-2 text-[15px] text-slate-700 marker:text-slate-400">{children}</ul>,
-  ol: ({ children }: any) => <ol className="list-decimal pl-5 mb-5 space-y-2 text-[15px] text-slate-700 marker:text-slate-600 marker:font-medium">{children}</ol>,
+  ul: ({ children }: any) => <ul className="list-disc pl-5 mb-5 space-y-2 text-[14px] md:text-[15px] text-slate-700 marker:text-slate-400">{children}</ul>,
+  ol: ({ children }: any) => <ol className="list-decimal pl-5 mb-5 space-y-2 text-[14px] md:text-[15px] text-slate-700 marker:text-slate-600 marker:font-medium">{children}</ol>,
   li: ({ children }: any) => <li className="leading-relaxed pl-1">{children}</li>,
   blockquote: ({ children }: any) => (
     <div className="bg-indigo-50/40 border border-indigo-100 p-4 sm:p-5 rounded-[16px] flex flex-col sm:flex-row gap-3 sm:gap-4 my-6 shadow-sm relative overflow-hidden">
@@ -52,26 +51,25 @@ const MemoizedMarkdownComponents: any = {
       <div className="mt-0.5 shrink-0 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm border border-indigo-50 ml-1">
         <Activity className="w-4 h-4 text-indigo-600" />
       </div>
-      <div className="flex-1 text-[15px] leading-relaxed text-slate-700 [&>p]:mb-3 last:[&>p]:mb-0 [&_strong]:!text-slate-900 [&_strong]:text-[15px] [&_ul]:mb-0 [&_ol]:mb-0">
+      <div className="flex-1 text-[14px] md:text-[15px] leading-relaxed text-slate-700 [&>p]:mb-3 last:[&>p]:mb-0 [&_strong]:!text-slate-900 [&_strong]:text-[14px] md:[&_strong]:text-[15px] [&_ul]:mb-0 [&_ol]:mb-0">
         {children}
       </div>
     </div>
   ),
   table: ({ children }: any) => (
-    <div className="overflow-x-auto my-6 border border-slate-200 rounded-[12px] shadow-sm">
-      <table className="w-full text-[14px] text-left text-slate-600 min-w-[500px]">{children}</table>
+    <div className="overflow-x-auto my-6 border border-slate-200 rounded-[12px] shadow-sm no-scrollbar">
+      <table className="w-full text-[13px] md:text-[14px] text-left text-slate-600 min-w-[500px]">{children}</table>
     </div>
   ),
   thead: ({ children }: any) => <thead className="bg-slate-50 text-slate-900 font-semibold border-b border-slate-200">{children}</thead>,
   tbody: ({ children }: any) => <tbody className="divide-y divide-slate-100 bg-white">{children}</tbody>,
   tr: ({ children }: any) => <tr className="hover:bg-slate-50/50 transition-colors">{children}</tr>,
-  th: ({ children }: any) => <th className="px-5 py-3.5 whitespace-nowrap">{children}</th>,
-  td: ({ children }: any) => <td className="px-5 py-4 align-top leading-relaxed">{children}</td>,
-  h3: ({ children }: any) => <h3 className="text-lg font-bold text-slate-900 mt-6 mb-3">{children}</h3>,
-  h4: ({ children }: any) => <h4 className="text-base font-bold text-slate-900 mt-5 mb-2">{children}</h4>,
+  th: ({ children }: any) => <th className="px-4 md:px-5 py-3 md:py-3.5 whitespace-nowrap">{children}</th>,
+  td: ({ children }: any) => <td className="px-4 md:px-5 py-3 md:py-4 align-top leading-relaxed">{children}</td>,
+  h3: ({ children }: any) => <h3 className="text-base md:text-lg font-bold text-slate-900 mt-6 mb-3">{children}</h3>,
+  h4: ({ children }: any) => <h4 className="text-sm md:text-base font-bold text-slate-900 mt-5 mb-2">{children}</h4>,
 };
 
-// 🌟 MESIN TIK AJAIB (ANTI-LAG)
 const RevealTypewriter = ({ text, onType }: { text: string, onType: () => void }) => {
   const [content, setContent] = useState('');
 
@@ -100,7 +98,6 @@ const RevealTypewriter = ({ text, onType }: { text: string, onType: () => void }
     </ReactMarkdown>
   );
 };
-
 
 export default function ChatPage() {
   const router = useRouter();
@@ -155,12 +152,9 @@ export default function ChatPage() {
 
     const userText = input.trim();
 
-    // 🌟 PERBAIKAN: Ubah judul di Sidebar secara otomatis (Optimistic Update)
     setSessions((prevSessions) => 
       prevSessions.map((session) => {
-        // Jika ini adalah sesi yang sedang aktif dan judulnya masih "Konsultasi Baru"
         if (session.id === currentSessionId && (session.title === 'Konsultasi Baru' || session.title === 'New Chat')) {
-          // Ambil maksimal 4 kata pertama sebagai judul
           const words = userText.split(' ');
           const newTitle = words.length > 4 ? words.slice(0, 4).join(' ') + '...' : userText;
           return { ...session, title: newTitle };
@@ -246,7 +240,7 @@ export default function ChatPage() {
         setSessions(prev => [data.data, ...prev]);
         setCurrentSessionId(data.data.id);
         setMessages([]);
-        setIsHistoryOpen(false);
+        if (window.innerWidth < 768) setIsHistoryOpen(false); // Tutup drawer di HP setelah buat sesi
       }
     } catch (error) {
       console.error('Gagal buat sesi baru:', error);
@@ -308,10 +302,10 @@ export default function ChatPage() {
   }, []);
 
   return (
-    <div className="fixed inset-0 z-[9999] flex h-screen w-full font-sans antialiased text-slate-800 bg-[#FFFFFF]">
+    <div className="fixed inset-0 z-[9999] flex h-[100dvh] w-full font-sans antialiased text-slate-800 bg-[#FFFFFF]">
       
-      {/* SIDEBAR KIRI 68px */}
-      <div className="w-[68px] shrink-0 bg-[#F8FAFC] border-r border-slate-200 flex flex-col items-center py-4 justify-between z-20 shadow-[2px_0_15px_rgba(0,0,0,0.03)]">
+      {/* 🌟 PERBAIKAN MOBILE: SIDEBAR HANYA MUNCUL DI DESKTOP (hidden md:flex) */}
+      <div className="hidden md:flex w-[68px] shrink-0 bg-[#F8FAFC] border-r border-slate-200 flex-col items-center py-4 justify-between z-20 shadow-[2px_0_15px_rgba(0,0,0,0.03)]">
         <div className="flex flex-col items-center gap-4 w-full">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#4F46E5] to-[#06B6D4] flex items-center justify-center shadow-md">
             <Bot className="w-5 h-5 text-white" />
@@ -343,6 +337,17 @@ export default function ChatPage() {
         </div>
       </div>
 
+      {/* 🌟 PERBAIKAN MOBILE: BACKDROP GELAP SAAT DRAWER DIBUKA DI HP */}
+      <AnimatePresence>
+        {isHistoryOpen && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            onClick={() => setIsHistoryOpen(false)}
+            className="md:hidden fixed inset-0 bg-slate-900/20 backdrop-blur-sm z-40"
+          />
+        )}
+      </AnimatePresence>
+
       {/* DRAWER HISTORY */}
       <AnimatePresence>
         {isHistoryOpen && (
@@ -350,33 +355,48 @@ export default function ChatPage() {
             initial={{ width: 0, opacity: 0 }}
             animate={{ width: 280, opacity: 1 }}
             exit={{ width: 0, opacity: 0 }}
-            className="bg-[#F9FAFB] border-r border-slate-100 flex flex-col shrink-0 z-10 overflow-hidden"
+            /* 🌟 PERBAIKAN MOBILE: Menjadi absolute menumpuk (z-50) di HP, tapi tetap sejalan (relative) di Laptop */
+            className="fixed md:relative inset-y-0 left-0 bg-[#F9FAFB] border-r border-slate-200 shadow-2xl md:shadow-none flex flex-col shrink-0 z-50 md:z-10 overflow-hidden"
           >
             <div className="w-[280px] h-full flex flex-col">
-              <div className="px-4 py-5 font-semibold text-sm text-slate-700 flex justify-between items-center">
+              <div className="px-4 py-5 font-semibold text-sm text-slate-700 flex justify-between items-center border-b md:border-transparent border-slate-100">
                 Riwayat Chat
-                <button onClick={() => setIsHistoryOpen(false)} className="p-1 hover:bg-slate-200 rounded-md text-slate-400">
+                <button onClick={() => setIsHistoryOpen(false)} className="p-1 hover:bg-slate-200 rounded-md text-slate-400 md:hidden">
                   <X className="w-4 h-4" />
                 </button>
               </div>
-              <div className="flex-1 overflow-y-auto px-2 space-y-0.5 scrollbar-thin">
+
+              {/* 🌟 PERBAIKAN MOBILE: Tombol Chat Baru & Pengaturan dimasukkan ke menu HP karena Sidebar disembunyikan */}
+              <div className="md:hidden flex gap-2 p-4 border-b border-slate-100">
+                <button onClick={createNewSession} className="flex-1 flex items-center justify-center gap-2 bg-indigo-600 text-white py-2 rounded-xl text-sm font-medium hover:bg-indigo-700 transition-colors">
+                  <Plus className="w-4 h-4" /> Chat Baru
+                </button>
+                <button onClick={() => router.push('/dashboard/settings')} className="w-11 flex items-center justify-center bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl transition-colors">
+                  <Settings className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto px-2 py-2 space-y-0.5 scrollbar-thin">
                 {sessions.map((session) => (
                   <div 
                     key={session.id}
-                    onClick={() => setCurrentSessionId(session.id)}
-                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg cursor-pointer transition-all group text-[13px] ${
+                    onClick={() => {
+                      setCurrentSessionId(session.id);
+                      if (window.innerWidth < 768) setIsHistoryOpen(false); // Tutup drawer otomatis di HP
+                    }}
+                    className={`w-full flex items-center justify-between px-3 py-3 md:py-2.5 rounded-lg cursor-pointer transition-all group text-[13px] ${
                       currentSessionId === session.id ? 'bg-white shadow-sm border border-slate-100 font-medium text-slate-800' : 'hover:bg-slate-200/50 text-slate-600'
                     }`}
                   >
                     <div className="flex items-center gap-2.5 overflow-hidden flex-1">
-                      <MessageSquare className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                      <MessageSquare className="w-4 h-4 md:w-3.5 md:h-3.5 text-slate-400 shrink-0" />
                       <span className="truncate">{session.title}</span>
                     </div>
                     <button 
                       onClick={(e) => deleteSession(e, session.id)} 
-                      className="text-slate-400 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-opacity ml-2 shrink-0"
+                      className="text-slate-400 hover:text-rose-500 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity ml-2 shrink-0 p-1"
                     >
-                      <Trash2 className="w-3.5 h-3.5" />
+                      <Trash2 className="w-4 h-4 md:w-3.5 md:h-3.5" />
                     </button>
                   </div>
                 ))}
@@ -388,20 +408,32 @@ export default function ChatPage() {
 
       {/* MAIN AREA (OBROLAN) */}
       <div 
-        className="flex-1 flex flex-col h-screen overflow-hidden relative"
+        className="flex-1 flex flex-col h-[100dvh] overflow-hidden relative"
         style={{ background: 'linear-gradient(180deg, #F8FBFF 0%, #FFFFFF 100%)' }}
       >
         
-        {/* 🌟 KAPSUL HEADER (Posisi diperlebar dan efek glass dipertahankan) */}
-        <header className="absolute top-0 left-0 w-full pt-6 px-6 sm:px-10 z-30 flex items-start justify-between pointer-events-none">
-          <div className="pointer-events-auto flex items-center gap-2.5 text-[14px] font-semibold text-slate-700 bg-white/80 px-5 py-2.5 rounded-full backdrop-blur-md border border-slate-200/60 shadow-sm">
-            <Bot className="w-4 h-4 text-indigo-500" />
-            EIO Health AI
+        {/* KAPSUL HEADER */}
+        {/* 🌟 PERBAIKAN MOBILE: Padding atas dikecilkan (pt-4) dan ditambah tombol Hamburger Menu */}
+        <header className="absolute top-0 left-0 w-full pt-4 md:pt-6 px-4 md:px-10 z-30 flex items-start justify-between pointer-events-none">
+          <div className="pointer-events-auto flex items-center gap-2">
+            
+            {/* Tombol Hamburger HP */}
+            <button
+               onClick={() => setIsHistoryOpen(true)}
+               className="md:hidden flex items-center justify-center w-10 h-10 bg-white/80 backdrop-blur-md border border-slate-200 rounded-full shadow-sm text-slate-600 hover:text-indigo-600 transition-colors"
+             >
+               <Menu className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center gap-2 text-[13px] md:text-[14px] font-semibold text-slate-700 bg-white/80 px-4 py-2.5 md:px-5 md:py-2.5 rounded-full backdrop-blur-md border border-slate-200/60 shadow-sm">
+              <Bot className="w-4 h-4 text-indigo-500 shrink-0" />
+              <span className="hidden sm:inline">EIO Health AI</span>
+            </div>
           </div>
           
           <button 
             onClick={() => router.push('/dashboard')}
-            className="pointer-events-auto flex items-center gap-2 px-5 py-2.5 bg-white/80 backdrop-blur-md border border-slate-200 hover:border-indigo-300 text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-full shadow-sm transition-all duration-200 text-[13px] font-semibold"
+            className="pointer-events-auto flex items-center gap-2 px-4 py-2.5 md:px-5 md:py-2.5 bg-white/80 backdrop-blur-md border border-slate-200 hover:border-indigo-300 text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-full shadow-sm transition-all duration-200 text-[13px] font-semibold shrink-0"
             title="Kembali ke Dashboard"
           >
             <Home className="w-4 h-4" />
@@ -409,27 +441,27 @@ export default function ChatPage() {
           </button>
         </header>
 
-        {/* 🌟 MASKER GRADASI MENGGUNAKAN INLINE CSS MUTLAK (DIJAMIN KERJA 100%) */}
-        {/* Masker ini membuat teks yang discroll menghilang tepat di bawah kapsul header */}
+        {/* MASKER GRADASI MENGGUNAKAN INLINE CSS MUTLAK */}
         <div 
-          className="absolute top-0 left-0 w-full h-40 z-20 pointer-events-none"
+          className="absolute top-0 left-0 w-full h-32 md:h-40 z-20 pointer-events-none"
           style={{ background: 'linear-gradient(180deg, #F8FBFF 45%, rgba(248, 251, 255, 0) 100%)' }}
         />
 
-        {/* AREA CHAT (pt-32 agar teks mulai di bawah masker tebal saat pertama kali masuk) */}
-        <main className="flex-1 overflow-y-auto w-full pt-32 pb-40 px-4 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
+        {/* AREA CHAT */}
+        {/* 🌟 PERBAIKAN MOBILE: Padding bawah disesuaikan agar tidak tertutup input keyboard */}
+        <main className="flex-1 overflow-y-auto w-full pt-24 md:pt-32 pb-36 md:pb-40 px-4 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
           
           {/* EMPTY STATE */}
           {messages.length === 0 && (
             <div className="h-full flex flex-col items-center justify-center max-w-[800px] mx-auto w-full">
-              <h1 className="text-3xl font-bold text-slate-800 mb-2 tracking-tight">EIOHealth AI Assistant</h1>
-              <p className="text-slate-500 text-[15px] mb-12">Konsultasi kesehatan cerdas berbasis AI</p>
+              <h1 className="text-2xl md:text-3xl font-bold text-slate-800 mb-2 tracking-tight text-center">EIOHealth AI Assistant</h1>
+              <p className="text-slate-500 text-[14px] md:text-[15px] mb-8 md:mb-12 text-center">Konsultasi kesehatan cerdas berbasis AI</p>
               
-              <div className="flex flex-wrap justify-center gap-3 w-full">
+              <div className="flex flex-wrap justify-center gap-2 md:gap-3 w-full px-2">
                 {quickPrompts.map((btn, idx) => (
                   <button
                     key={idx} onClick={() => setInput(btn.prompt)}
-                    className="px-4 py-2 rounded-full bg-white border border-slate-200 hover:border-indigo-300 hover:bg-slate-50 text-slate-600 transition-all text-[13px] shadow-sm font-medium"
+                    className="px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-white border border-slate-200 hover:border-indigo-300 hover:bg-slate-50 text-slate-600 transition-all text-[12px] md:text-[13px] shadow-sm font-medium"
                   >
                     {btn.text}
                   </button>
@@ -439,7 +471,7 @@ export default function ChatPage() {
           )}
 
           {/* ACTIVE CHAT AREA */}
-          <div className="w-full max-w-[850px] mx-auto flex flex-col gap-6 relative z-10">
+          <div className="w-full max-w-[850px] mx-auto flex flex-col gap-5 md:gap-6 relative z-10">
             <AnimatePresence initial={false}>
               {messages.map((msg, idx) => {
                 const isUser = msg.role === 'user';
@@ -471,20 +503,21 @@ export default function ChatPage() {
                   >
                     {isUser ? (
                       /* BUBBLE USER */
-                        <div className="ml-auto px-6 py-4 bg-slate-900 text-white rounded-3xl rounded-br-md shadow-sm max-w-[85%] md:max-w-[75%]">
-                        <div className="text-[15px] font-medium leading-relaxed whitespace-pre-wrap">{msgText}</div>
+                      /* 🌟 PERBAIKAN MOBILE: Padding dan Font dikecilkan sedikit */
+                        <div className="ml-auto px-4 py-3 md:px-6 md:py-4 bg-slate-900 text-white rounded-[20px] md:rounded-3xl rounded-br-md shadow-sm max-w-[85%] md:max-w-[75%]">
+                        <div className="text-[14px] md:text-[15px] font-medium leading-relaxed whitespace-pre-wrap">{msgText}</div>
                       </div>
                     ) : (
                       /* BUBBLE AI & AVATAR UNGU */
-                      <div className="mr-auto flex gap-4 w-full max-w-[95%] md:max-w-[90%] z-0">
+                      <div className="mr-auto flex gap-3 md:gap-4 w-full max-w-[98%] md:max-w-[90%] z-0">
                         
-                        <div className="flex w-10 h-10 md:w-12 md:h-12 rounded-full bg-indigo-600 items-center justify-center shrink-0 mt-1 shadow-md shadow-indigo-500/20">
-                          <Sparkles className="w-5 h-5 md:w-6 md:h-6 text-white" />
+                        <div className="flex w-8 h-8 md:w-12 md:h-12 rounded-full bg-indigo-600 items-center justify-center shrink-0 mt-1 shadow-md shadow-indigo-500/20">
+                          <Sparkles className="w-4 h-4 md:w-6 md:h-6 text-white" />
                         </div>
                         
                         <div className="flex flex-col items-start gap-1 w-full min-w-0">
                           
-                          <div className="w-full px-5 py-5 md:px-7 md:py-6 bg-white border border-slate-200 rounded-3xl rounded-tl-md shadow-sm">
+                          <div className="w-full px-4 py-4 md:px-7 md:py-6 bg-white border border-slate-200 rounded-[20px] md:rounded-3xl rounded-tl-md shadow-sm">
                             {isLastMsg && !isProcessing ? (
                               <RevealTypewriter text={msgText} onType={scrollToBottom} />
                             ) : (
@@ -514,16 +547,16 @@ export default function ChatPage() {
 
             {isProcessing && (
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex w-full">
-                <div className="mr-auto flex gap-4 w-full max-w-[95%] md:max-w-[90%]">
-                  <div className="flex w-10 h-10 md:w-12 md:h-12 rounded-full bg-indigo-600 items-center justify-center shrink-0 mt-1 shadow-md shadow-indigo-500/20">
-                    <Sparkles className="w-5 h-5 md:w-6 md:h-6 text-white animate-pulse" />
+                <div className="mr-auto flex gap-3 md:gap-4 w-full max-w-[98%] md:max-w-[90%]">
+                  <div className="flex w-8 h-8 md:w-12 md:h-12 rounded-full bg-indigo-600 items-center justify-center shrink-0 mt-1 shadow-md shadow-indigo-500/20">
+                    <Sparkles className="w-4 h-4 md:w-6 md:h-6 text-white animate-pulse" />
                   </div>
-                  <div className="px-6 py-5 bg-white border border-slate-200 rounded-[28px] rounded-tl-[8px] shadow-sm flex items-center gap-3 w-fit h-[56px] md:h-[64px]">
-                    <span className="text-[14px] font-medium text-slate-500">Menganalisis</span>
+                  <div className="px-5 py-4 md:px-6 md:py-5 bg-white border border-slate-200 rounded-[20px] md:rounded-[28px] rounded-tl-[8px] shadow-sm flex items-center gap-3 w-fit h-[48px] md:h-[64px]">
+                    <span className="text-[13px] md:text-[14px] font-medium text-slate-500">Menganalisis</span>
                     <div className="flex items-center gap-1.5 pt-1">
-                      <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                      <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                      <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                      <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                      <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                     </div>
                   </div>
                 </div>
@@ -533,12 +566,13 @@ export default function ChatPage() {
           </div>
         </main>
 
-        {/* 4. CHAT INPUT */}
-        <div className="absolute bottom-0 w-full bg-gradient-to-t from-white via-white/95 to-transparent pt-6 pb-8 px-4 pointer-events-none z-30">
+        {/* CHAT INPUT */}
+        {/* 🌟 PERBAIKAN MOBILE: Padding form disesuaikan agar hemat tempat (pb-safe) */}
+        <div className="absolute bottom-0 w-full bg-gradient-to-t from-white via-white/95 to-transparent pt-4 pb-4 md:pt-6 md:pb-8 px-3 md:px-4 pointer-events-none z-30">
           <div className="max-w-[800px] mx-auto w-full pointer-events-auto">
             
             {serviceError && (
-              <div className="mb-3 flex items-center gap-2.5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-sm text-rose-700 shadow-sm">
+              <div className="mb-3 flex items-center gap-2.5 rounded-xl border border-rose-200 bg-rose-50 px-3 md:px-4 py-2.5 text-xs md:text-sm text-rose-700 shadow-sm">
                 <AlertCircle className="h-4 w-4 shrink-0 text-rose-500" />
                 <p className="flex-1 font-medium">{serviceError}</p>
               </div>
@@ -546,11 +580,11 @@ export default function ChatPage() {
 
             {/* File Preview */}
             {attachments.length > 0 && (
-              <div className="flex gap-2 mb-2 overflow-x-auto pb-1 pl-4">
+              <div className="flex gap-2 mb-2 overflow-x-auto pb-1 pl-2 md:pl-4 no-scrollbar">
                 {attachments.map((file, idx) => (
-                  <div key={idx} className="flex items-center gap-2 bg-white border border-slate-200 px-3 py-1.5 rounded-lg shadow-sm shrink-0">
+                  <div key={idx} className="flex items-center gap-1.5 md:gap-2 bg-white border border-slate-200 px-2 md:px-3 py-1.5 rounded-lg shadow-sm shrink-0">
                     {file.type.includes('image') ? <ImageIcon className="w-3.5 h-3.5 text-[#06B6D4]" /> : <FileText className="w-3.5 h-3.5 text-[#4F46E5]" />}
-                    <span className="text-[12px] font-medium text-slate-600 max-w-[100px] truncate">{file.name}</span>
+                    <span className="text-[11px] md:text-[12px] font-medium text-slate-600 max-w-[80px] md:max-w-[100px] truncate">{file.name}</span>
                     <button type="button" onClick={() => removeAttachment(idx)} className="ml-1 text-slate-400 hover:text-rose-500 transition-colors">
                       <X className="w-3 h-3" />
                     </button>
@@ -562,11 +596,12 @@ export default function ChatPage() {
             {/* Input Form */}
             <form
               onSubmit={handleSubmit}
-              className="relative flex items-end gap-1.5 bg-white border border-[rgba(0,0,0,0.1)] shadow-[0_4px_20px_rgba(0,0,0,0.04)] rounded-[32px] px-2 py-1.5 focus-within:border-[rgba(0,0,0,0.2)] transition-all duration-200"
+              className="relative flex items-end gap-1 bg-white border border-[rgba(0,0,0,0.1)] shadow-[0_4px_20px_rgba(0,0,0,0.04)] rounded-[24px] md:rounded-[32px] px-1 md:px-2 py-1 md:py-1.5 focus-within:border-[rgba(0,0,0,0.2)] transition-all duration-200"
             >
               <div className="relative">
                 <input type="file" id="file-upload" className="hidden" onChange={handleFileUpload} accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" />
-                <label htmlFor="file-upload" className="cursor-pointer p-2.5 m-0.5 flex text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors shrink-0">
+                <label htmlFor="file-upload" className="cursor-pointer p-2 md:p-2.5 m-0.5 flex text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors shrink-0">
+                  <Plus className="w-5 h-5 md:w-6 md:h-6" /> {/* Icon lampiran agar lebih intuitif */}
                 </label>
               </div>
               
@@ -580,7 +615,7 @@ export default function ChatPage() {
                   }
                 }}
                 placeholder={isListening ? "Mendengarkan..." : "Kirim pesan ke EIOHealth AI..."}
-                className="flex-1 bg-transparent border-none py-3 px-1 text-[15px] text-slate-800 placeholder:text-slate-400 focus:outline-none resize-none max-h-[150px] min-h-[44px] scrollbar-thin"
+                className="flex-1 bg-transparent border-none py-2.5 md:py-3 px-1 text-[14px] md:text-[15px] text-slate-800 placeholder:text-slate-400 focus:outline-none resize-none max-h-[120px] md:max-h-[150px] min-h-[40px] md:min-h-[44px] scrollbar-thin"
                 rows={1}
                 disabled={isProcessing}
                 onInput={(e) => {
@@ -592,7 +627,7 @@ export default function ChatPage() {
               <button
                 type="button"
                 onClick={toggleMic}
-                className={`p-2.5 m-0.5 shrink-0 rounded-full transition-all duration-200 ${
+                className={`p-2 md:p-2.5 m-0.5 shrink-0 rounded-full transition-all duration-200 ${
                   isListening
                     ? 'bg-rose-100 text-rose-600 animate-pulse'
                     : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'
@@ -604,14 +639,14 @@ export default function ChatPage() {
               <button
                 type="submit"
                 disabled={isProcessing || (!input.trim() && attachments.length === 0)}
-                className="p-2.5 m-0.5 rounded-full bg-slate-900 text-white disabled:bg-slate-100 disabled:text-slate-300 disabled:cursor-not-allowed hover:bg-indigo-600 transition-colors duration-200 shrink-0 flex items-center justify-center"
+                className="p-2 md:p-2.5 m-0.5 rounded-full bg-slate-900 text-white disabled:bg-slate-100 disabled:text-slate-300 disabled:cursor-not-allowed hover:bg-indigo-600 transition-colors duration-200 shrink-0 flex items-center justify-center"
               >
-                {isProcessing ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-4 h-4 ml-0.5" />}
+                {isProcessing ? <Loader2 className="w-4 h-4 md:w-5 md:h-5 animate-spin" /> : <Send className="w-4 h-4 md:w-4 md:h-4 ml-0.5" />}
               </button>
             </form>
 
-            <div className="text-center mt-3">
-              <span className="text-[11px] text-slate-400">
+            <div className="text-center mt-2 md:mt-3">
+              <span className="text-[10px] md:text-[11px] text-slate-400">
                 EIOHealth AI dapat membuat kesalahan. Periksa informasi klinis yang penting.
               </span>
             </div>

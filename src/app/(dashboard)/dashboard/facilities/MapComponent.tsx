@@ -7,19 +7,20 @@ import 'leaflet/dist/leaflet.css';
 import { Navigation } from 'lucide-react';
 
 // --- CUSTOM ICONS ---
+// 🌟 PERBAIKAN MOBILE: Ukuran ikon peta diperkecil sedikit agar tidak menutupi jalanan saat dibuka di HP
 const createCustomIcon = (bgColor: string, svgPath: string) => {
   return L.divIcon({
     html: `
-      <div style="background-color: ${bgColor}; width: 32px; height: 32px; border-radius: 50%; border: 2px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center;">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <div style="background-color: ${bgColor}; width: 28px; height: 28px; border-radius: 50%; border: 2px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           ${svgPath}
         </svg>
       </div>
     `,
     className: 'custom-leaflet-icon',
-    iconSize: [32, 32],
-    iconAnchor: [16, 32],
-    popupAnchor: [0, -32],
+    iconSize: [28, 28],
+    iconAnchor: [14, 28],
+    popupAnchor: [0, -28],
   });
 };
 
@@ -37,7 +38,8 @@ const apotekIcon = createCustomIcon('#10b981', apotekSvg);
 function MapUpdater({ center }: { center: [number, number] }) {
   const map = useMap();
   useEffect(() => {
-    map.flyTo(center, 15, { animate: true, duration: 1.5 });
+    // 🌟 PERBAIKAN: Zoom otomatis sedikit dijauhkan (14) agar area yang terlihat di HP lebih luas
+    map.flyTo(center, 14, { animate: true, duration: 1.5 });
     const timeout = setTimeout(() => { map.invalidateSize(); }, 400);
     return () => clearTimeout(timeout);
   }, [center, map]);
@@ -60,7 +62,7 @@ export default function MapComponent({
   facilities,
   routePolyline,
   onMapClick,
-  onSelectFacility // Callback prop baru untuk menangkap klik rute dari map
+  onSelectFacility
 }: { 
   currentLocation: any,
   mapCenter: any,
@@ -74,7 +76,7 @@ export default function MapComponent({
       <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
       <MapContainer 
         center={[mapCenter.lat, mapCenter.lng]} 
-        zoom={15} 
+        zoom={14} 
         style={{ width: '100%', height: '100%', zIndex: 0, cursor: 'crosshair' }} 
         zoomControl={false}
       >
@@ -85,8 +87,9 @@ export default function MapComponent({
         
         {routePolyline && routePolyline.length > 0 && (
           <>
-            <Polyline positions={routePolyline} color="#6366F1" weight={8} opacity={0.3} lineCap="round" lineJoin="round" />
-            <Polyline positions={routePolyline} color="#4F46E5" weight={5} opacity={0.9} lineCap="round" lineJoin="round" />
+            {/* 🌟 PERBAIKAN MOBILE: Garis polyline dikecilkan sedikit agar rute terlihat lebih halus di layar HP */}
+            <Polyline positions={routePolyline} color="#6366F1" weight={6} opacity={0.3} lineCap="round" lineJoin="round" />
+            <Polyline positions={routePolyline} color="#4F46E5" weight={4} opacity={0.9} lineCap="round" lineJoin="round" />
           </>
         )}
 
@@ -94,7 +97,7 @@ export default function MapComponent({
         <MapClickHandler onMapClick={onMapClick} />
 
         <Marker position={[currentLocation.lat, currentLocation.lng]} icon={userIcon}>
-          <Popup className="font-sans font-bold">Titik Awal</Popup>
+          <Popup className="font-sans font-bold text-xs">Titik Awal</Popup>
         </Marker>
 
         {facilities.map((facility) => {
@@ -104,18 +107,18 @@ export default function MapComponent({
 
           return (
             <Marker key={facility.id} position={[facility.lat, facility.lon]} icon={icon}>
-              <Popup className="font-sans rounded-xl">
-                <div className="flex flex-col gap-1 min-w-[160px] p-1">
-                  <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-wider">{facility.category}</span>
-                  <span className="font-bold text-slate-800 text-[13px] leading-tight mb-2">{facility.name}</span>
+              {/* 🌟 PERBAIKAN MOBILE: Popup diatur lebar maksimalnya (max-w-[200px]) agar rapi di HP */}
+              <Popup className="font-sans rounded-xl max-w-[200px]">
+                <div className="flex flex-col gap-1 w-full p-0.5">
+                  <span className="text-[9px] font-bold text-indigo-600 uppercase tracking-wider">{facility.category}</span>
+                  <span className="font-bold text-slate-800 text-[12px] leading-snug mb-2">{facility.name}</span>
                   
-                  {/* TOMBOL PENYEMPURNAAN: KLIK UNTUK DIREKSI RUTE */}
                   <button
                     onClick={() => onSelectFacility(facility)}
                     className="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold py-1.5 px-2 rounded-lg flex items-center justify-center gap-1.5 transition-colors shadow-sm"
                   >
                     <Navigation className="w-3 h-3 fill-white rotate-45" />
-                    Cari Jalan Raya
+                    Cari Jalan
                   </button>
                 </div>
               </Popup>
