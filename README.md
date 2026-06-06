@@ -41,9 +41,7 @@ EIO Health adalah platform kesehatan digital komprehensif yang menyediakan layan
 * PostgreSQL (Neon Database)
 
 ### Artificial Intelligence
-* Vercel AI SDK
 * Groq API
-* OpenAI API
 
 ### Authentication & Security
 * JSON Web Token (JWT)
@@ -179,4 +177,4 @@ Aplikasi dapat dideploy menggunakan platform seperti Vercel, Railway, Render, at
 
 Proyek ini dikembangkan untuk keperluan akademik pada Mata Kuliah Rekayasa Perangkat Lunak Program Studi Teknik Informatika Universitas Muhammadiyah Kalimantan Timur.
 
-*© 2026 Kelompok 11 – Teknik Informatika UMKT*
+*© 2026 Kelompok 15 – Teknik Informatika UMKT*
