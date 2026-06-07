@@ -2,16 +2,16 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, Lock, Eye, EyeOff, ArrowRight, Loader2 } from 'lucide-react';
+// 🌟 Tambahkan 'Home' di import lucide-react
+import { Mail, Lock, Eye, EyeOff, ArrowRight, Loader2, Home } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation'; // Untuk pindah halaman
+import { useRouter } from 'next/navigation';
 
 export default function LoginForm() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   
-  // State untuk menangkap ketikan
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -34,13 +34,12 @@ export default function LoginForm() {
         throw new Error(data.error || "Gagal login");
       }
 
-      // Jika berhasil login, langsung arahkan ke Dashboard
       router.push('/dashboard');
-      router.refresh(); // Memaksa Next.js memperbarui state halaman
+      router.refresh(); 
 
     } catch (error: any) {
       setErrorMessage(error.message);
-      setIsLoading(false); // Matikan loading HANYA jika gagal
+      setIsLoading(false); 
     }
   };
 
@@ -51,8 +50,18 @@ export default function LoginForm() {
       transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
       className="w-full max-w-[420px]"
     >
-      <div className="bg-[rgba(255,255,255,0.65)] backdrop-blur-xl border border-white/60 p-8 sm:p-10 rounded-[32px] shadow-[0_8px_32px_rgba(0,0,0,0.04)] hover:shadow-[0_16px_48px_rgba(79,70,229,0.1)] transition-shadow duration-500">
+      {/* 🌟 Tambahkan class 'relative' di pembungkus kartu agar tombol Home bisa absolute di dalamnya */}
+      <div className="relative bg-[rgba(255,255,255,0.65)] backdrop-blur-xl border border-white/60 p-8 sm:p-10 rounded-[32px] shadow-[0_8px_32px_rgba(0,0,0,0.04)] hover:shadow-[0_16px_48px_rgba(79,70,229,0.1)] transition-shadow duration-500">
         
+        {/* 🌟 Tombol Kembali ke Beranda (Landing Page) */}
+        <Link 
+          href="/" 
+          className="absolute top-6 right-6 flex items-center justify-center w-10 h-10 bg-white/50 hover:bg-white border border-white shadow-sm hover:shadow-md text-gray-500 hover:text-indigo-600 rounded-full transition-all duration-300 z-10"
+          title="Kembali ke Halaman Utama"
+        >
+          <Home className="w-4 h-4" />
+        </Link>
+
         <div className="text-center mb-8">
           <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Log in</h2>
           <p className="text-sm text-gray-500 mt-2">Masuk untuk melanjutkan ke EIOHealth</p>

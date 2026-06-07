@@ -115,7 +115,7 @@ export default function FooterSection() {
         {/* BOTTOM BAR: Copyright & Legal */}
         <div className="border-t border-gray-100 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-xs text-gray-400 font-inter">
-            © 2026 EIOHealth by Apt. Kamal Ilham. All rights reserved.
+            © 2026 EIOHealth by Kelompok 15. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
             <Link href="#" className="text-xs text-gray-400 hover:text-gray-900 font-inter transition-colors">
