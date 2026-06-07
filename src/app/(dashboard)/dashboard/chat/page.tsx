@@ -10,7 +10,7 @@ import remarkGfm from 'remark-gfm';
 import {
   Send, Mic, Bot, MessageSquare, Loader2, AlertCircle,
   Home, Copy, RefreshCcw, Trash2, Check, FileText, Image as ImageIcon, X,
-  Activity, Plus, Search, History, Settings, Sparkles, Menu // 🌟 Tambahan icon Menu
+  Activity, Plus, Search, History, Settings, Sparkles, Menu 
 } from 'lucide-react';
 import { getFriendlyChatError } from '@/lib/ai-errors';
 
@@ -134,6 +134,7 @@ export default function ChatPage() {
   const isProcessing = status === 'submitted' || status === 'streaming';
 
   const loadSessionMessages = useCallback(async (sessionId: string) => {
+    if (!sessionId || sessionId === 'pending-session') return;
     try {
       const res = await fetch(`/api/chat/session/${sessionId}/messages`);
       if (!res.ok) throw new Error(`API Error: ${res.status}`);
@@ -248,13 +249,34 @@ export default function ChatPage() {
   };
 
   const deleteSession = async (e: React.MouseEvent, id: string) => {
-    e.stopPropagation();
+    e.stopPropagation(); // Mencegah klik tombol hapus malah membuka chatnya
+
+    // 1. Hapus dari layar (UI) secara instan agar aplikasi terasa sangat cepat
     setSessions(sessions.filter(s => s.id !== id));
+
+    // 2. Beri tahu Database (Backend) untuk menghancurkan data tersebut
+    try {
+      // Memanggil rute DELETE yang ada di file src/app/api/chat/session/route.ts
+      const response = await fetch(`/api/chat/session?sessionId=${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        console.error("Gagal menghapus riwayat dari database.");
+      }
+    } catch (error) {
+      console.error("Terjadi kesalahan jaringan saat menghapus chat:", error);
+    }
+
+    // 3. Pindahkan layar ke chat lain jika chat yang sedang dibuka ikut dihapus
     if (currentSessionId === id) {
       setMessages([]);
       const nextSession = sessions.find(s => s.id !== id);
-      if (nextSession) setCurrentSessionId(nextSession.id);
-      else createNewSession();
+      if (nextSession) {
+        setCurrentSessionId(nextSession.id);
+      } else {
+        createNewSession();
+      }
     }
   };
 
@@ -598,24 +620,19 @@ export default function ChatPage() {
               onSubmit={handleSubmit}
               className="relative flex items-end gap-1 bg-white border border-[rgba(0,0,0,0.1)] shadow-[0_4px_20px_rgba(0,0,0,0.04)] rounded-[24px] md:rounded-[32px] px-1 md:px-2 py-1 md:py-1.5 focus-within:border-[rgba(0,0,0,0.2)] transition-all duration-200"
             >
-              <div className="relative">
-                <input type="file" id="file-upload" className="hidden" onChange={handleFileUpload} accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" />
-                <label htmlFor="file-upload" className="cursor-pointer p-2 md:p-2.5 m-0.5 flex text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors shrink-0">
-                  <Plus className="w-5 h-5 md:w-6 md:h-6" /> {/* Icon lampiran agar lebih intuitif */}
-                </label>
-              </div>
-              
               <textarea
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
-                    if ((input.trim() || attachments.length > 0) && !isProcessing) handleSubmit(e);
+                    // Cukup cek input teks saja, abaikan attachments
+                    if (input.trim() && !isProcessing) handleSubmit(e);
                   }
                 }}
                 placeholder={isListening ? "Mendengarkan..." : "Kirim pesan ke EIOHealth AI..."}
-                className="flex-1 bg-transparent border-none py-2.5 md:py-3 px-1 text-[14px] md:text-[15px] text-slate-800 placeholder:text-slate-400 focus:outline-none resize-none max-h-[120px] md:max-h-[150px] min-h-[40px] md:min-h-[44px] scrollbar-thin"
+                // Padding kiri ditambah (px-4) agar teks tidak mepet pinggir setelah ikon dihapus
+                className="flex-1 bg-transparent border-none py-2.5 md:py-3 px-4 text-[14px] md:text-[15px] text-slate-800 placeholder:text-slate-400 focus:outline-none resize-none max-h-[120px] md:max-h-[150px] min-h-[40px] md:min-h-[44px] scrollbar-thin"
                 rows={1}
                 disabled={isProcessing}
                 onInput={(e) => {

@@ -92,9 +92,7 @@ export default function LoginForm() {
           <div className="space-y-1.5">
             <div className="flex items-center justify-between ml-1">
               <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Password</label>
-              <Link href="/forgot-password" className="text-xs font-medium text-indigo-600 hover:text-indigo-700 transition-colors">
-                Lupa?
-              </Link>
+              <Link href="#" onClick={(e) => e.preventDefault()} className="text-xs font-medium text-indigo-600 hover:text-indigo-700 transition-colors">Lupa?</Link>
             </div>
             <div className="relative group">
               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">

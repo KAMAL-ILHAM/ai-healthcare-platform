@@ -1,11 +1,9 @@
-import { Pool, neonConfig } from '@neondatabase/serverless';
 import { PrismaClient } from '@prisma/client';
 
-// Cache global agar Next.js tidak membuka terlalu banyak koneksi saat Anda menekan Save
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
 export const prisma = globalForPrisma.prisma || new PrismaClient({
-  log: ['error', 'warn'], // Opsional: hanya menampilkan log jika ada error
+  log: ['error', 'warn'], 
 });
 
 if (process.env.NODE_ENV !== 'production') {
@@ -13,4 +11,3 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 export default prisma;
-

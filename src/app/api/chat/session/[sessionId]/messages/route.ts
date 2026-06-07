@@ -33,22 +33,3 @@ export async function GET(
     return NextResponse.json({ error: 'Gagal mengambil pesan sesi.' }, { status: 500 });
   }
 }
-
-// METHOD DELETE (Tambahkan ini agar error sebelumnya hilang)
-export async function DELETE(
-  _req: Request,
-  { params }: { params: Promise<{ sessionId: string }> }
-) {
-  try {
-    // Tambahkan validasi user ID juga jika diperlukan
-    const { sessionId } = await params;
-    
-    // Panggil logika penghapusan dari service kamu
-    // contoh: await ChatService.deleteSession(sessionId);
-
-    return NextResponse.json({ success: true, message: 'Sesi berhasil dihapus' });
-  } catch (error) {
-    console.error('[DELETE_SESSION_ERROR]', error);
-    return NextResponse.json({ error: 'Gagal menghapus sesi.' }, { status: 500 });
-  }
-}

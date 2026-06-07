@@ -1,20 +1,53 @@
 import { NextResponse } from 'next/server';
-import { ChatService } from '@/app/services/chat.service'; 
+import { ChatService } from '@/app/services/chat.service';
+import type { UIMessage } from 'ai';
 import prisma from '@/lib/prisma';
 
-// [GET] /api/chat/session -> Untuk Sidebar
-export async function GET(req: Request) {
+
+function toUIMessage(msg: { id: string; role: string; content: string }): UIMessage {
+  return {
+    id: msg.id,
+    role: msg.role === 'USER' ? 'user' : 'assistant',
+    parts: [{ type: 'text', text: msg.content }],
+  };
+}
+
+// METHOD GET (Dilengkapi Proteksi Anti-Crash)
+export async function GET(
+  _req: Request,
+  { params }: any, // Menggunakan 'any' sementara untuk mencegah error tipe data strict di Next.js 15
+) {
   try {
-    const userId = req.headers.get('x-user-id');
+    const userId = _req.headers.get('x-user-id');
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized: User ID tidak ditemukan' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    // 1. Resolve Promise params (Aturan baru Next.js 15)
+    const resolvedParams = await params;
     
-    const sessions = await ChatService.getUserSessions(userId);
-    return NextResponse.json({ success: true, data: sessions });
+    // 2. Proteksi Nama Folder: Tangkap ID baik dari [sessionId] maupun [sessionsId]
+    const id = resolvedParams.sessionId || resolvedParams.sessionsId;
+
+    if (!id || id === 'undefined') {
+      return NextResponse.json({ error: 'Session ID tidak valid.' }, { status: 400 });
+    }
+
+    // 3. Ambil data dari database
+    const dbMessages = await ChatService.getSessionMessages(id, userId);
+    
+    // 4. PROTEKSI UTAMA: Jika dbMessages kosong/null, paksa menjadi array kosong [] 
+    // agar fungsi .map() di bawah tidak memicu Error 500
+    const safeMessages = dbMessages || [];
+
+    return NextResponse.json({
+      success: true,
+      data: safeMessages.map(toUIMessage),
+    });
+
   } catch (error) {
-    console.error('[GET_SESSIONS_ERROR]', error);
-    return NextResponse.json({ error: 'Gagal mengambil riwayat.' }, { status: 500 });
+    console.error('[GET_SESSION_MESSAGES_ERROR]', error);
+    return NextResponse.json({ error: 'Gagal mengambil pesan sesi.' }, { status: 500 });
   }
 }
 

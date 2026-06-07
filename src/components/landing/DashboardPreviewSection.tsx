@@ -197,7 +197,7 @@ export default function DashboardPreviewSection() {
                 {/* Input Bar */}
                 <div className="mt-3 sm:mt-4 shrink-0 px-1">
                   <div className="w-full flex items-center bg-slate-50 border border-slate-200 rounded-full py-1 sm:py-1.5 px-1.5 sm:px-2 text-sm">
-                    <div className="p-1.5 sm:p-2 text-slate-400"><Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" /></div>
+                    <div className="p-1.5 sm:p-2 text-slate-400"></div>
                     <span className="flex-1 px-2 text-[11px] sm:text-xs text-slate-400 font-medium whitespace-nowrap overflow-hidden text-ellipsis">Mulai Konsultasi...</span>
                     <div className="p-1.5 sm:p-2 text-slate-400 mr-0.5 sm:mr-1"><Mic className="w-3.5 h-3.5 sm:w-4 sm:h-4" /></div>
                     <div className="p-1.5 sm:p-2 bg-slate-900 text-white rounded-full"><Send className="w-3 h-3 sm:w-3.5 sm:h-3.5 ml-0.5" /></div>
