@@ -18,7 +18,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="h-auto md:h-[calc(100vh-100px)] flex flex-col gap-4 md:gap-6 overflow-visible md:overflow-hidden pb-2">
-      {/* 🌟 PERBAIKAN MOBILE: h-auto agar bisa di-scroll di HP, md:h-[calc...] hanya untuk laptop */}
+      {/*   PERBAIKAN MOBILE: h-auto agar bisa di-scroll di HP, md:h-[calc...] hanya untuk laptop */}
       
       <div className="shrink-0">
         <DashboardStats 
@@ -27,11 +27,11 @@ export default async function DashboardPage() {
         />
       </div>
 
-      {/* 🌟 PERBAIKAN MOBILE: Jarak grid diperkecil di HP (gap-4) */}
+      {/*   PERBAIKAN MOBILE: Jarak grid diperkecil di HP (gap-4) */}
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 min-h-0">
         
         {/* --- PANEL KIRI: AI CHAT --- */}
-        {/* 🌟 PERBAIKAN MOBILE: Tinggi statis h-[450px] untuk HP, radius dan padding disesuaikan */}
+        {/*   PERBAIKAN MOBILE: Tinggi statis h-[450px] untuk HP, radius dan padding disesuaikan */}
         <div className="lg:col-span-2 bg-white/80 backdrop-blur-xl border border-white/80 p-4 md:p-6 rounded-[24px] md:rounded-[32px] shadow-sm flex flex-col overflow-hidden h-[450px] md:h-full">
           
           <div className="flex items-center justify-between mb-4 shrink-0 relative">
@@ -102,7 +102,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* --- PANEL KANAN: ARTIKEL --- */}
-        {/* 🌟 PERBAIKAN MOBILE: Tinggi auto di HP agar list artikel tidak tergencet */}
+        {/*   PERBAIKAN MOBILE: Tinggi auto di HP agar list artikel tidak tergencet */}
         <div className="bg-white/60 backdrop-blur-xl border border-white/80 p-4 md:p-6 rounded-[24px] md:rounded-[32px] shadow-sm flex flex-col h-auto md:h-full overflow-hidden min-h-0">
           
           <div className="flex items-center justify-between mb-4 w-full shrink-0">

@@ -1,19 +1,20 @@
 import { NextResponse } from 'next/server';
-import { ChatService } from '@/app/services/chat.service';
+import prisma from '@/lib/prisma'; // Pastikan path import prisma sudah benar
 import type { UIMessage } from 'ai';
 
-function toUIMessage(msg: { id: string; role: string; content: string }): UIMessage {
+function toUIMessage(msg: any): UIMessage {
+  // @ts-ignore
   return {
     id: msg.id,
-    role: msg.role === 'USER' ? 'user' : 'assistant',
+    role: msg.role?.toUpperCase() === 'USER' ? 'user' : 'assistant',
+    content: msg.content, 
     parts: [{ type: 'text', text: msg.content }],
-  };
+  }as any;
 }
 
-// METHOD GET (Sudah Benar)
 export async function GET(
   _req: Request,
-  { params }: { params: Promise<{ sessionId: string }> },
+  { params }: any
 ) {
   try {
     const userId = _req.headers.get('x-user-id');
@@ -21,13 +22,31 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { sessionId } = await params;
-    const dbMessages = await ChatService.getSessionMessages(sessionId, userId);
+    const resolvedParams = await params;
+    
+    const id = resolvedParams.sessionsId || resolvedParams.sessionId;
+
+    if (!id) {
+       return NextResponse.json({ error: 'Session ID tidak ditemukan' }, { status: 400 });
+    }
+
+    
+    const dbMessages = await prisma.chatMessage.findMany({
+      where: { 
+        sessionId: id 
+      },
+      orderBy: { 
+        createdAt: 'asc' 
+      }
+    });
+
+    const safeMessages = dbMessages || [];
 
     return NextResponse.json({
       success: true,
-      data: dbMessages.map(toUIMessage),
+      data: safeMessages.map(toUIMessage),
     });
+
   } catch (error) {
     console.error('[GET_SESSION_MESSAGES_ERROR]', error);
     return NextResponse.json({ error: 'Gagal mengambil pesan sesi.' }, { status: 500 });

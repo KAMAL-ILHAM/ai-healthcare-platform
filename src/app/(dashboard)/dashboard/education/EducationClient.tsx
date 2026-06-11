@@ -59,7 +59,7 @@ export default function EducationClient({
   return (
     <div className="max-w-7xl mx-auto space-y-4 md:space-y-6">
 
-      {/* 🌟 PERBAIKAN MOBILE: Tambah snap-x agar scroll menu lebih halus di HP */}
+      {/*   PERBAIKAN MOBILE: Tambah snap-x agar scroll menu lebih halus di HP */}
       <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-3 snap-x snap-mandatory">
         {initialCategories.map((cat) => (
           <button
@@ -78,13 +78,13 @@ export default function EducationClient({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-start">
         
         {/* KONTEN UTAMA (KIRI) */}
-        {/* 🌟 PERBAIKAN MOBILE: gap disesuaikan */}
+        {/*   PERBAIKAN MOBILE: gap disesuaikan */}
         <motion.div variants={containerVariants} initial="hidden" animate="show" className="lg:col-span-2 space-y-6 md:space-y-8">
           
           {/* ARTIKEL UTAMA (FEATURED) */}
           {featuredArticle && activeCategory === 'Semua Topik' && (
             <Link href={featuredArticle.url} target={featuredArticle.isApi ? "_blank" : "_self"} className="block">
-              {/* 🌟 PERBAIKAN MOBILE: h-[300px] di HP, h-[380px] di Desktop */}
+              {/*   PERBAIKAN MOBILE: h-[300px] di HP, h-[380px] di Desktop */}
               <motion.div variants={itemVariants} className="relative w-full h-[300px] md:h-[380px] rounded-[24px] md:rounded-[28px] overflow-hidden group cursor-pointer shadow-sm hover:shadow-xl transition-all duration-500">
                 <div className="absolute inset-0 bg-slate-900">
                   <img src={featuredArticle.image} alt={featuredArticle.title} className="w-full h-full object-cover opacity-60 group-hover:opacity-70 group-hover:scale-105 transition-all duration-700 ease-out" />
@@ -97,7 +97,7 @@ export default function EducationClient({
                       <Sparkles className="w-3 h-3" /> {featuredArticle.category}
                     </span>
                   </div>
-                  {/* 🌟 PERBAIKAN MOBILE: Ukuran font diperkecil sedikit */}
+                  {/*   PERBAIKAN MOBILE: Ukuran font diperkecil sedikit */}
                   <h2 className="text-xl md:text-3xl font-extrabold text-white leading-tight mb-2 tracking-tight group-hover:text-cyan-100 transition-colors line-clamp-2 md:line-clamp-3">
                     {featuredArticle.title}
                   </h2>
@@ -117,13 +117,13 @@ export default function EducationClient({
           )}
 
           {/* LIST ARTIKEL BIASA */}
-          {/* 🌟 PERBAIKAN MOBILE: max-h-none agar tidak numpuk/scroll di dalam layar HP. Di laptop tetap max-h-[560px] */}
+          {/*   PERBAIKAN MOBILE: max-h-none agar tidak numpuk/scroll di dalam layar HP. Di laptop tetap max-h-[560px] */}
           <div className="max-h-none lg:max-h-[560px] overflow-y-visible lg:overflow-y-auto pr-0 lg:pr-2 pb-2 lg:pb-4 no-scrollbar">
             {filteredArticles.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5">
                 {filteredArticles.map((article) => (
                   <Link key={article.id} href={article.url} target={article.isApi ? "_blank" : "_self"} className="block h-full">
-                    {/* 🌟 PERBAIKAN MOBILE: Padding diperkecil sedikit di HP */}
+                    {/*   PERBAIKAN MOBILE: Padding diperkecil sedikit di HP */}
                     <motion.div variants={itemVariants} className="bg-white/70 backdrop-blur-xl border border-white/80 p-3.5 md:p-4 rounded-[20px] md:rounded-3xl shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 group cursor-pointer flex flex-col h-full">
                       
                       <div className="w-full aspect-video mb-3 md:mb-4 rounded-xl md:rounded-2xl overflow-hidden relative shadow-sm">
@@ -162,11 +162,11 @@ export default function EducationClient({
         </motion.div>
 
         {/* WIDGET KANAN */}
-        {/* 🌟 Di HP menumpuk normal, di Laptop jadi lengket (sticky) */}
+        {/*   Di HP menumpuk normal, di Laptop jadi lengket (sticky) */}
         <div className="space-y-4 md:space-y-6 lg:sticky lg:top-6 pb-6 md:pb-0">
           
           {/* AI RECOMMENDATION */}
-          {/* 🌟 PERBAIKAN MOBILE: Padding dan Font dikecilkan */}
+          {/*   PERBAIKAN MOBILE: Padding dan Font dikecilkan */}
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }} className="bg-gradient-to-br from-[#1A2352] to-[#0F172A] p-5 md:p-6 rounded-[24px] md:rounded-[28px] shadow-xl relative overflow-hidden group border border-white/5">
             <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 blur-3xl rounded-full" />
             <div className="absolute bottom-0 left-0 w-32 h-32 bg-indigo-500/20 blur-3xl rounded-full" />
@@ -200,7 +200,7 @@ export default function EducationClient({
           </motion.div>
 
           {/* TRENDING TOPICS */}
-          {/* 🌟 PERBAIKAN MOBILE: Padding dan Font dikecilkan */}
+          {/*   PERBAIKAN MOBILE: Padding dan Font dikecilkan */}
           <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="bg-white/70 backdrop-blur-xl border border-white/80 p-5 md:p-6 rounded-[24px] md:rounded-[28px] shadow-sm">
             <div className="flex items-center gap-2 md:gap-3 mb-4 md:mb-6">
               <div className="p-1.5 md:p-2 bg-rose-50 rounded-lg md:rounded-xl">

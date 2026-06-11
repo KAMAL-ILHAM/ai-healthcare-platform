@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-// 🌟 Tambahkan 'Home' di import lucide-react
+//   Tambahkan 'Home' di import lucide-react
 import { Mail, Lock, Eye, EyeOff, ArrowRight, Loader2, Home } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -50,10 +50,10 @@ export default function LoginForm() {
       transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
       className="w-full max-w-[420px]"
     >
-      {/* 🌟 Tambahkan class 'relative' di pembungkus kartu agar tombol Home bisa absolute di dalamnya */}
+      {/*   Tambahkan class 'relative' di pembungkus kartu agar tombol Home bisa absolute di dalamnya */}
       <div className="relative bg-[rgba(255,255,255,0.65)] backdrop-blur-xl border border-white/60 p-8 sm:p-10 rounded-[32px] shadow-[0_8px_32px_rgba(0,0,0,0.04)] hover:shadow-[0_16px_48px_rgba(79,70,229,0.1)] transition-shadow duration-500">
         
-        {/* 🌟 Tombol Kembali ke Beranda (Landing Page) */}
+        {/*   Tombol Kembali ke Beranda (Landing Page) */}
         <Link 
           href="/" 
           className="absolute top-6 right-6 flex items-center justify-center w-10 h-10 bg-white/50 hover:bg-white border border-white shadow-sm hover:shadow-md text-gray-500 hover:text-indigo-600 rounded-full transition-all duration-300 z-10"

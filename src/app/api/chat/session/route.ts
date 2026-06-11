@@ -12,42 +12,28 @@ function toUIMessage(msg: { id: string; role: string; content: string }): UIMess
   };
 }
 
-// METHOD GET (Dilengkapi Proteksi Anti-Crash)
-export async function GET(
-  _req: Request,
-  { params }: any, // Menggunakan 'any' sementara untuk mencegah error tipe data strict di Next.js 15
-) {
+export async function GET(_req: Request) {
   try {
     const userId = _req.headers.get('x-user-id');
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // 1. Resolve Promise params (Aturan baru Next.js 15)
-    const resolvedParams = await params;
-    
-    // 2. Proteksi Nama Folder: Tangkap ID baik dari [sessionId] maupun [sessionsId]
-    const id = resolvedParams.sessionId || resolvedParams.sessionsId;
-
-    if (!id || id === 'undefined') {
-      return NextResponse.json({ error: 'Session ID tidak valid.' }, { status: 400 });
-    }
-
-    // 3. Ambil data dari database
-    const dbMessages = await ChatService.getSessionMessages(id, userId);
-    
-    // 4. PROTEKSI UTAMA: Jika dbMessages kosong/null, paksa menjadi array kosong [] 
-    // agar fungsi .map() di bawah tidak memicu Error 500
-    const safeMessages = dbMessages || [];
+    // Ambil daftar riwayat sesi dari database (sesuaikan dengan metode ORM kamu)
+    // Asumsi menggunakan Prisma langsung atau ChatService
+    const sessions = await prisma.chatSession.findMany({
+      where: { userId: userId },
+      orderBy: { updatedAt: 'desc' }
+    });
 
     return NextResponse.json({
       success: true,
-      data: safeMessages.map(toUIMessage),
+      data: sessions,
     });
 
   } catch (error) {
-    console.error('[GET_SESSION_MESSAGES_ERROR]', error);
-    return NextResponse.json({ error: 'Gagal mengambil pesan sesi.' }, { status: 500 });
+    console.error('[GET_SESSIONS_ERROR]', error);
+    return NextResponse.json({ error: 'Gagal mengambil riwayat sesi.' }, { status: 500 });
   }
 }
 
@@ -69,14 +55,17 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Gagal membuat sesi.' }, { status: 500 });
   }
 }
-
 export async function DELETE(req: Request) {
   try {
-    // Ambil sessionId dari URL (contoh: /api/chat/session?sessionId=123)
+    // 1. Ambil userId dari header (seperti fungsi GET dan POST)
+    const userId = req.headers.get('x-user-id');
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const url = new URL(req.url);
     const sessionId = url.searchParams.get("sessionId");
 
-    // Validasi jika sessionId kosong
     if (!sessionId) {
       return NextResponse.json(
         { error: 'Session ID tidak ditemukan pada URL' }, 
@@ -84,10 +73,22 @@ export async function DELETE(req: Request) {
       );
     }
 
-    // Menghapus dari database berdasarkan sessionId
-    await prisma.chatSession.delete({
-      where: { id: sessionId }
+    // 2. PROTEKSI GANDA: Pastikan chat yang akan dihapus memang milik userId ini
+    // Menggunakan deleteMany lebih aman karena kita bisa menumpuk dua kondisi (id DAN userId)
+    const deleteResult = await prisma.chatSession.deleteMany({
+      where: { 
+        id: sessionId,
+        userId: userId // <--- Mencegah pengguna menghapus chat orang lain
+      }
     });
+
+    // Jika count 0, berarti ID chat tidak ada atau bukan milik user tersebut
+    if (deleteResult.count === 0) {
+      return NextResponse.json(
+        { error: 'Chat tidak ditemukan atau Anda tidak memiliki akses untuk menghapusnya' }, 
+        { status: 404 }
+      );
+    }
 
     return NextResponse.json({ success: true, message: 'Chat berhasil dihapus' });
   } catch (error) {

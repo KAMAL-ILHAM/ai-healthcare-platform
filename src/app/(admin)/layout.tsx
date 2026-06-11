@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken';
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const cookieStore = await cookies();
   
-  // 🌟 PERBAIKAN: Ubah 'token' menjadi 'admin_session' sesuai log terminal!
+  //   PERBAIKAN: Ubah 'token' menjadi 'admin_session' sesuai log terminal!
   const token = cookieStore.get('admin_session')?.value; 
   
   let currentUser = null;
@@ -33,7 +33,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           currentUser = {
             name: user.name || "Pengguna Tanpa Nama",
             isStaff: user.isStaff,
-            role: user.role // 🌟 Lempar data role ini ke Client
+            role: user.role //   Lempar data role ini ke Client
           };
         }
       }

@@ -22,7 +22,7 @@ function timeAgo(date: Date) {
 }
 
 export default async function AdminDashboard() {
-  // 🌟 MENGAMBIL DATA REAL DARI DATABASE SECARA PARALEL (SUPER CEPAT)
+  //   MENGAMBIL DATA REAL DARI DATABASE SECARA PARALEL (SUPER CEPAT)
   const [
     totalArticles,
     publishedArticles,

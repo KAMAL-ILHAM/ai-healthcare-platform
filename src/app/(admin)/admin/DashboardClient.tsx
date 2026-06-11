@@ -36,7 +36,7 @@ export default function DashboardClient({ stats, latestArticles, recentActivitie
   const [isArticlesModalOpen, setIsArticlesModalOpen] = useState(false);
   const [isActivitiesModalOpen, setIsActivitiesModalOpen] = useState(false);
 
-  // 🌟 OKE MASUK: Batasi tampilan awal hanya 3 item saja di Dashboard
+  //   OKE MASUK: Batasi tampilan awal hanya 3 item saja di Dashboard
   const displayedArticles = latestArticles.slice(0, 3);
   const displayedActivities = recentActivities.slice(0, 3);
 
@@ -218,9 +218,9 @@ export default function DashboardClient({ stats, latestArticles, recentActivitie
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* KARTU ARTIKEL TERBARU (KIRI) */}
-        {/* 🌟 FIX TINGGI: Diperpendek menjadi h-[315px] karena hanya memuat 3 data */}
+        {/*   FIX TINGGI: Diperpendek menjadi h-[315px] karena hanya memuat 3 data */}
         <div className="lg:col-span-2 bg-white border border-gray-100 rounded-xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.05)] p-6 h-[315px] flex flex-col">
-          {/* 🌟 FIX TOMBOL: Berada di sebelah kanan ujung ujung card */}
+          {/*   FIX TOMBOL: Berada di sebelah kanan ujung ujung card */}
           <div className="flex items-center justify-between mb-4 shrink-0">
             <h3 className="text-base font-bold text-gray-900">Artikel Terbaru</h3>
             {latestArticles.length > 3 && (
@@ -257,9 +257,9 @@ export default function DashboardClient({ stats, latestArticles, recentActivitie
         </div>
 
         {/* KARTU AKTIVITAS TERAKHIR (KANAN) */}
-        {/* 🌟 FIX TINGGI: h-[315px] agar seimbang dengan sisi kiri */}
+        {/*   FIX TINGGI: h-[315px] agar seimbang dengan sisi kiri */}
         <div className="bg-white border border-gray-100 rounded-xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.05)] p-6 h-[315px] flex flex-col">
-          {/* 🌟 FIX TOMBOL: Menggunakan IKON SAJA di ujung sebelah kanan card */}
+          {/*   FIX TOMBOL: Menggunakan IKON SAJA di ujung sebelah kanan card */}
           <div className="flex items-center justify-between mb-4 shrink-0">
             <h3 className="text-base font-bold text-gray-900">Aktivitas Terakhir</h3>
             {recentActivities.length > 3 && (

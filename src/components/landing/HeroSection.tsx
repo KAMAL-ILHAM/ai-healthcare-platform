@@ -19,11 +19,11 @@ export default function HeroSection() {
         <div className="absolute bottom-[20%] left-[50%] -translate-x-1/2 w-[500px] md:w-[800px] h-[300px] md:h-[400px] bg-indigo-500/5 rounded-full blur-[120px] md:blur-[150px] mix-blend-multiply" />
       </div>
 
-      {/* 🌟 2. FLOATING ICONS (NGAMBANG) */}
+      {/*   2. FLOATING ICONS (NGAMBANG) */}
       <div className="absolute inset-0 pointer-events-none z-10 overflow-hidden">
         
         {/* Ikon Kiri Atas */}
-        {/* 🌟 PERBAIKAN: Padding diperkecil di HP (p-2), teks disembunyikan (hidden md:block) */}
+        {/*   PERBAIKAN: Padding diperkecil di HP (p-2), teks disembunyikan (hidden md:block) */}
         <motion.div 
           animate={{ y: [-10, 10, -10] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
           className="absolute top-[20%] left-[2%] md:top-[25%] md:left-[10%] xl:left-[15%] bg-white/80 backdrop-blur-md p-2 md:p-4 rounded-xl md:rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.08)] border border-white flex flex-col items-center gap-1.5 md:gap-2 rotate-[-5deg]"

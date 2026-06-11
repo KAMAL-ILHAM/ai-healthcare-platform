@@ -22,7 +22,7 @@ export default function Header({ userName = "Pengguna" }: { userName?: string })
   return (
     <header className="h-20 md:h-24 px-4 md:px-8 flex items-center justify-between shrink-0 relative z-10 mt-2 md:mt-0">
       
-      {/* 🌟 min-w-0 penting agar teks panjang bisa terpotong elipsis di HP */}
+      {/*   min-w-0 penting agar teks panjang bisa terpotong elipsis di HP */}
       <div className="flex-1 min-w-0 pr-4">
         <AnimatePresence mode="wait">
           

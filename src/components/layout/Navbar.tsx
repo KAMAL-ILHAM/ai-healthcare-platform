@@ -78,7 +78,7 @@ export default function Navbar() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 flex flex-col items-center p-4 md:p-6 pointer-events-none">
-      {/* 🌟 KAPSUL NAVBAR UTAMA */}
+      {/*   KAPSUL NAVBAR UTAMA */}
       <motion.nav
         initial={{ width: '80%', opacity: 0, y: -20 }}
         animate={{ width: '95%', opacity: 1, y: 0 }}
@@ -103,7 +103,7 @@ export default function Navbar() {
           </span>
         </Link>
 
-        {/* 🌟 DESKTOP NAVIGATION */}
+        {/*   DESKTOP NAVIGATION */}
         <div className="hidden md:flex items-center gap-1">
           {/* Loop Menu Utama */}
           {mainLinks.map((link) => {
@@ -177,7 +177,7 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* 🌟 ACTION BUTTONS (DESKTOP) */}
+        {/*   ACTION BUTTONS (DESKTOP) */}
         <div className="hidden md:flex items-center gap-4 shrink-0">
           <Link href="/login" className="text-sm font-bold text-gray-600 hover:text-gray-900 transition-colors">
             Masuk
@@ -195,7 +195,7 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* 🌟 TOMBOL HAMBURGER (MOBILE) */}
+        {/*   TOMBOL HAMBURGER (MOBILE) */}
         <button 
           className="md:hidden p-2.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100/50 rounded-full transition-colors" 
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -204,7 +204,7 @@ export default function Navbar() {
         </button>
       </motion.nav>
 
-      {/* 🌟 MENU DROPDOWN SELULER (MOBILE MENU) */}
+      {/*   MENU DROPDOWN SELULER (MOBILE MENU) */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div

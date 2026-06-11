@@ -7,7 +7,7 @@ import 'leaflet/dist/leaflet.css';
 import { Navigation } from 'lucide-react';
 
 // --- CUSTOM ICONS ---
-// 🌟 PERBAIKAN MOBILE: Ukuran ikon peta diperkecil sedikit agar tidak menutupi jalanan saat dibuka di HP
+//   PERBAIKAN MOBILE: Ukuran ikon peta diperkecil sedikit agar tidak menutupi jalanan saat dibuka di HP
 const createCustomIcon = (bgColor: string, svgPath: string) => {
   return L.divIcon({
     html: `
@@ -38,7 +38,7 @@ const apotekIcon = createCustomIcon('#10b981', apotekSvg);
 function MapUpdater({ center }: { center: [number, number] }) {
   const map = useMap();
   useEffect(() => {
-    // 🌟 PERBAIKAN: Zoom otomatis sedikit dijauhkan (14) agar area yang terlihat di HP lebih luas
+    //   PERBAIKAN: Zoom otomatis sedikit dijauhkan (14) agar area yang terlihat di HP lebih luas
     map.flyTo(center, 14, { animate: true, duration: 1.5 });
     const timeout = setTimeout(() => { map.invalidateSize(); }, 400);
     return () => clearTimeout(timeout);
@@ -87,7 +87,7 @@ export default function MapComponent({
         
         {routePolyline && routePolyline.length > 0 && (
           <>
-            {/* 🌟 PERBAIKAN MOBILE: Garis polyline dikecilkan sedikit agar rute terlihat lebih halus di layar HP */}
+            {/*   PERBAIKAN MOBILE: Garis polyline dikecilkan sedikit agar rute terlihat lebih halus di layar HP */}
             <Polyline positions={routePolyline} color="#6366F1" weight={6} opacity={0.3} lineCap="round" lineJoin="round" />
             <Polyline positions={routePolyline} color="#4F46E5" weight={4} opacity={0.9} lineCap="round" lineJoin="round" />
           </>
@@ -107,7 +107,7 @@ export default function MapComponent({
 
           return (
             <Marker key={facility.id} position={[facility.lat, facility.lon]} icon={icon}>
-              {/* 🌟 PERBAIKAN MOBILE: Popup diatur lebar maksimalnya (max-w-[200px]) agar rapi di HP */}
+              {/*   PERBAIKAN MOBILE: Popup diatur lebar maksimalnya (max-w-[200px]) agar rapi di HP */}
               <Popup className="font-sans rounded-xl max-w-[200px]">
                 <div className="flex flex-col gap-1 w-full p-0.5">
                   <span className="text-[9px] font-bold text-indigo-600 uppercase tracking-wider">{facility.category}</span>

@@ -455,7 +455,7 @@ function AppearanceSettings() {
     <div className="bg-white/60 backdrop-blur-xl border border-white/80 p-5 sm:p-8 rounded-[24px] lg:rounded-[32px] shadow-[0_8px_32px_rgba(0,0,0,0.03)] max-w-2xl">
       <h3 className="text-base lg:text-lg font-bold text-gray-900 mb-1">Tema Aplikasi</h3>
       <p className="text-xs sm:text-sm text-gray-500 mb-5 sm:mb-6">Pilih mode tampilan yang nyaman untuk mata Anda.</p>
-      {/* 🌟 PERBAIKAN MOBILE: grid-cols-3 agar kartu tema jejer ke samping di HP tanpa scroll */}
+      {/*   PERBAIKAN MOBILE: grid-cols-3 agar kartu tema jejer ke samping di HP tanpa scroll */}
       <div className="grid grid-cols-3 gap-2 sm:gap-4">
         <div className="border-2 border-indigo-500 rounded-xl sm:rounded-2xl p-2 sm:p-4 cursor-pointer bg-gray-50 relative overflow-hidden group">
           <div className="absolute top-1 right-1 sm:top-2 sm:right-2 w-4 h-4 sm:w-5 sm:h-5 bg-indigo-500 rounded-full flex items-center justify-center">

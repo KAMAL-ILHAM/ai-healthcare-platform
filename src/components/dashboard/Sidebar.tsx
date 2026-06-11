@@ -21,7 +21,7 @@ export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter(); 
 
-  // 🌟 KUNCI RAHASIA: Jika sedang di halaman detail artikel, jangan tampilkan Sidebar/Navigasi
+  //   KUNCI RAHASIA: Jika sedang di halaman detail artikel, jangan tampilkan Sidebar/Navigasi
   const isReadingArticle = pathname.startsWith('/dashboard/education/') && pathname !== '/dashboard/education';
   if (isReadingArticle) return null;
 

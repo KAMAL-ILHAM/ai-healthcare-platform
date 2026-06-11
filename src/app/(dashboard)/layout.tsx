@@ -52,7 +52,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
       <div className="flex-1 flex flex-col min-w-0 relative z-10 h-screen overflow-hidden">
         <Header userName={userName} />
-        {/* 🌟 PERBAIKAN MOBILE: Padding px-4 untuk HP, pb-24 agar tidak tertutup Bottom Nav */}
+        {/*   PERBAIKAN MOBILE: Padding px-4 untuk HP, pb-24 agar tidak tertutup Bottom Nav */}
         <div className="flex-1 overflow-y-auto px-4 md:px-8 pb-24 md:pb-8 no-scrollbar">
           <div className="max-w-7xl mx-auto space-y-4 md:space-y-6">
             {children}

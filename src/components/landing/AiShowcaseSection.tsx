@@ -5,7 +5,7 @@ import { Bot, Sparkles, Activity, AlertTriangle, Stethoscope, MapPin, ChevronRig
 
 export default function AiShowcaseSection() {
   return (
-    // 🌟 PERBAIKAN MOBILE: Padding vertikal disesuaikan (py-12 di HP, py-16 di Desktop)
+    //   PERBAIKAN MOBILE: Padding vertikal disesuaikan (py-12 di HP, py-16 di Desktop)
     <section id="ai-health" className="py-12 md:py-16 bg-[#FAFCFF] relative overflow-hidden z-10">
       
       {/* Background Soft Glow & Blur */}
@@ -13,7 +13,7 @@ export default function AiShowcaseSection() {
       <div className="absolute -top-40 right-[-10%] w-[600px] h-[600px] bg-cyan-400/5 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-indigo-500/5 rounded-full blur-[120px] pointer-events-none" />
 
-      {/* 🌟 PERBAIKAN MOBILE: Padding horizontal disesuaikan (px-4 di HP, px-6 di Desktop) */}
+      {/*   PERBAIKAN MOBILE: Padding horizontal disesuaikan (px-4 di HP, px-6 di Desktop) */}
       <div className="container mx-auto px-4 md:px-6 max-w-7xl relative z-10">
         
         {/* Section Header */}
@@ -35,7 +35,7 @@ export default function AiShowcaseSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            // 🌟 PERBAIKAN MOBILE: Ukuran font judul disesuaikan
+            //   PERBAIKAN MOBILE: Ukuran font judul disesuaikan
             className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 md:mb-6 font-satoshi tracking-tight"
           >
             Konsultasi Medis <br className="md:hidden" />
@@ -47,7 +47,7 @@ export default function AiShowcaseSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            // 🌟 PERBAIKAN MOBILE: Ukuran deskripsi disesuaikan
+            //   PERBAIKAN MOBILE: Ukuran deskripsi disesuaikan
             className="text-sm sm:text-base md:text-lg text-gray-500 font-inter max-w-2xl mx-auto"
           >
             Asisten AI kami menganalisis gejala Anda secara real-time, memberikan edukasi awal, dan merekomendasikan langkah medis selanjutnya dengan presisi tinggi.
@@ -55,7 +55,7 @@ export default function AiShowcaseSection() {
         </div>
 
         {/* SPLIT LAYOUT: Chat (Left) & Panel (Right) */}
-        {/* 🌟 PERBAIKAN MOBILE: Jarak antar kolom diperkecil di HP (gap-6) */}
+        {/*   PERBAIKAN MOBILE: Jarak antar kolom diperkecil di HP (gap-6) */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 md:gap-8 items-center">
           
           {/* LEFT: Chat UI Interface (col-span-3) */}
@@ -64,7 +64,7 @@ export default function AiShowcaseSection() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            // 🌟 PERBAIKAN MOBILE: Tinggi (h-[420px]) dan border-radius diperkecil di HP
+            //   PERBAIKAN MOBILE: Tinggi (h-[420px]) dan border-radius diperkecil di HP
             className="lg:col-span-3 bg-white/70 backdrop-blur-2xl rounded-[24px] md:rounded-[2.5rem] border border-white shadow-[0_20px_50px_rgba(0,0,0,0.05)] overflow-hidden flex flex-col h-[420px] md:h-[550px]"
           >
             {/* Header Chat */}
@@ -89,7 +89,7 @@ export default function AiShowcaseSection() {
               {/* User Message 1 */}
               <motion.div 
                 initial={{ opacity: 0, y: 10, scale: 0.95 }} whileInView={{ opacity: 1, y: 0, scale: 1 }} viewport={{ once: true }} transition={{ delay: 0.2 }}
-                // 🌟 PERBAIKAN MOBILE: Lebar font, padding disesuaikan
+                //   PERBAIKAN MOBILE: Lebar font, padding disesuaikan
                 className="self-end bg-gradient-to-r from-gray-900 to-gray-800 text-white p-3 md:p-4 rounded-[16px] md:rounded-2xl rounded-tr-sm shadow-md max-w-[85%] md:max-w-[80%] font-inter text-[12px] md:text-sm leading-relaxed"
               >
                 Dok, sejak pagi saya merasa mual, pusing, dan ada nyeri di bagian ulu hati. Semalam saya telat makan.
@@ -150,7 +150,7 @@ export default function AiShowcaseSection() {
             {/* AI Diagnosis Indicator */}
             <motion.div 
               initial={{ opacity: 0, x: 40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.3 }}
-              // 🌟 PERBAIKAN MOBILE: Padding & Radius
+              //   PERBAIKAN MOBILE: Padding & Radius
               className="bg-white rounded-[20px] md:rounded-3xl p-4 md:p-5 border border-gray-100 shadow-[0_10px_40px_rgba(0,0,0,0.03)] hover:shadow-md transition-shadow relative overflow-hidden"
             >
               <div className="absolute top-0 left-0 w-1 h-full bg-cyan-500" />

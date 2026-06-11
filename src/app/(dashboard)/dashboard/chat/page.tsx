@@ -32,12 +32,24 @@ const quickPrompts = [
 type ChatSession = { id: string; title: string; updatedAt: string };
 type UploadedFile = { name: string; type: string; url?: string };
 
-function getMessageText(message: UIMessage): string {
-  return message.parts
-    .filter((part) => part.type === 'text')
-    .map((part) => part.text)
-    .join('');
+function getMessageText(message: any): string {
+  if (message.parts && Array.isArray(message.parts)) {
+    return message.parts
+      .filter((part: any) => part.type === 'text')
+      .map((part: any) => part.text)
+      .join('');
+  }
+  
+  return typeof message.content === 'string' ? message.content : '';
 }
+
+
+const getDynamicUserId = () => {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem('userId') || 'unauthenticated-user'; 
+  }
+  return 'unauthenticated-user';
+};
 
 const MemoizedMarkdownComponents: any = {
   p: ({ children }: any) => <p className="mb-4 last:mb-0 text-[14px] md:text-[15px] leading-relaxed text-slate-700 whitespace-pre-wrap">{children}</p>,
@@ -115,6 +127,19 @@ export default function ChatPage() {
 
   const transport = useMemo(() => new DefaultChatTransport({ api: '/api/chat' }), []);
 
+  const chatConfig: any = {
+    id: currentSessionId ?? 'pending-session',
+    api: '/api/chat',
+    headers: {
+      'x-user-id': getDynamicUserId(),
+    },
+    // 2. Tambahkan ': any' pada err agar masalah implicit any teratasi
+    onError: (err: any) => {
+      console.error('[CHAT_CLIENT_ERROR]', err.message);
+      setServiceError(getFriendlyChatError(err));
+    },
+  };
+
   const {
     messages,
     sendMessage,
@@ -122,33 +147,38 @@ export default function ChatPage() {
     status,
     error,
     clearError,
-  } = useChat({
-    id: currentSessionId ?? 'pending-session',
-    transport,
-    onError: (err) => {
-      console.error('[CHAT_CLIENT_ERROR]', err.message);
-      setServiceError(getFriendlyChatError(err));
-    },
-  });
+  } = useChat(chatConfig);
 
   const isProcessing = status === 'submitted' || status === 'streaming';
 
-  const loadSessionMessages = useCallback(async (sessionId: string) => {
+  const fetchMessagesForSession = async (sessionId: string) => {
     if (!sessionId || sessionId === 'pending-session') return;
+
+    setCurrentSessionId(sessionId);
+    if (window.innerWidth < 768) setIsHistoryOpen(false);
+
     try {
-      const res = await fetch(`/api/chat/session/${sessionId}/messages`);
-      if (!res.ok) throw new Error(`API Error: ${res.status}`);
+      console.log(`[DIAGNOSA] Meminta pesan untuk ID: ${sessionId}`);
+      const res = await fetch(`/api/chat/session/${sessionId}/messages`, {
+        headers: { 'x-user-id': getDynamicUserId() }
+      });
+
       const data = await res.json();
-      if (data.success) setMessages(data.data as UIMessage[]);
-      else setMessages([]);
+      console.log(`[DIAGNOSA] Data diterima:`, data);
+
+      if (data.success && data.data) {
+        setMessages(data.data as UIMessage[]);
+      } else {
+        setMessages([]);
+      }
     } catch (error) {
-      console.error('Gagal load pesan sesi:', error);
+      console.error('Gagal fetch pesan:', error);
       setMessages([]);
     }
-  }, [setMessages]);
+  };
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = (e?: React.FormEvent | React.KeyboardEvent) => {
+    if (e && e.preventDefault) e.preventDefault();
     if (isProcessing || (!input.trim() && attachments.length === 0) || !currentSessionId) return;
 
     const userText = input.trim();
@@ -157,7 +187,7 @@ export default function ChatPage() {
       prevSessions.map((session) => {
         if (session.id === currentSessionId && (session.title === 'Konsultasi Baru' || session.title === 'New Chat')) {
           const words = userText.split(' ');
-          const newTitle = words.length > 4 ? words.slice(0, 4).join(' ') + '...' : userText;
+          const newTitle = userText ? (words.length > 4 ? words.slice(0, 4).join(' ') + '...' : userText) : 'File Upload';
           return { ...session, title: newTitle };
         }
         return session;
@@ -166,9 +196,12 @@ export default function ChatPage() {
 
     setServiceError(null);
     clearError();
+    
     sendMessage(
-      { text: userText },
-      { body: { sessionId: currentSessionId, attachments: attachments } }
+      { text: userText || ' ' },
+      { 
+        body: { sessionId: currentSessionId, attachments: attachments } 
+      }
     );
     setInput('');
     setAttachments([]);
@@ -212,7 +245,10 @@ export default function ChatPage() {
   useEffect(() => {
     const loadInitialData = async () => {
       try {
-        const res = await fetch('/api/chat/session');
+        // PERBAIKAN: Kirim header identitas agar backend tahu chat siapa yang harus ditarik
+        const res = await fetch('/api/chat/session', {
+          headers: { 'x-user-id': getDynamicUserId() }
+        });
         if (!res.ok) throw new Error(`API Error: ${res.status}`);
         const data = await res.json();
         if (data.success && data.data.length > 0) {
@@ -228,20 +264,24 @@ export default function ChatPage() {
     loadInitialData();
   }, []);
 
-  useEffect(() => {
-    if (currentSessionId) loadSessionMessages(currentSessionId);
-  }, [currentSessionId, loadSessionMessages]);
-
   const createNewSession = async () => {
     try {
-      const res = await fetch('/api/chat/session', { method: 'POST' });
+      // PERBAIKAN: Kirim header identitas saat bikin sesi baru
+      const res = await fetch('/api/chat/session', { 
+        method: 'POST',
+        headers: { 
+          'x-user-id': getDynamicUserId(),
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ title: 'Konsultasi Baru' })
+      });
       if (!res.ok) throw new Error(`API Error: ${res.status}`);
       const data = await res.json();
       if (data.success) {
         setSessions(prev => [data.data, ...prev]);
         setCurrentSessionId(data.data.id);
         setMessages([]);
-        if (window.innerWidth < 768) setIsHistoryOpen(false); // Tutup drawer di HP setelah buat sesi
+        if (window.innerWidth < 768) setIsHistoryOpen(false); 
       }
     } catch (error) {
       console.error('Gagal buat sesi baru:', error);
@@ -249,16 +289,14 @@ export default function ChatPage() {
   };
 
   const deleteSession = async (e: React.MouseEvent, id: string) => {
-    e.stopPropagation(); // Mencegah klik tombol hapus malah membuka chatnya
-
-    // 1. Hapus dari layar (UI) secara instan agar aplikasi terasa sangat cepat
+    e.stopPropagation(); 
     setSessions(sessions.filter(s => s.id !== id));
 
-    // 2. Beri tahu Database (Backend) untuk menghancurkan data tersebut
     try {
-      // Memanggil rute DELETE yang ada di file src/app/api/chat/session/route.ts
+      // PERBAIKAN: Kirim header identitas agar backend yakin bahwa user ini berhak menghapus
       const response = await fetch(`/api/chat/session?sessionId=${id}`, {
         method: 'DELETE',
+        headers: { 'x-user-id': getDynamicUserId() }
       });
 
       if (!response.ok) {
@@ -268,7 +306,6 @@ export default function ChatPage() {
       console.error("Terjadi kesalahan jaringan saat menghapus chat:", error);
     }
 
-    // 3. Pindahkan layar ke chat lain jika chat yang sedang dibuka ikut dihapus
     if (currentSessionId === id) {
       setMessages([]);
       const nextSession = sessions.find(s => s.id !== id);
@@ -326,7 +363,7 @@ export default function ChatPage() {
   return (
     <div className="fixed inset-0 z-[9999] flex h-[100dvh] w-full font-sans antialiased text-slate-800 bg-[#FFFFFF]">
       
-      {/* 🌟 PERBAIKAN MOBILE: SIDEBAR HANYA MUNCUL DI DESKTOP (hidden md:flex) */}
+      {/*   SIDEBAR */}
       <div className="hidden md:flex w-[68px] shrink-0 bg-[#F8FAFC] border-r border-slate-200 flex-col items-center py-4 justify-between z-20 shadow-[2px_0_15px_rgba(0,0,0,0.03)]">
         <div className="flex flex-col items-center gap-4 w-full">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#4F46E5] to-[#06B6D4] flex items-center justify-center shadow-md">
@@ -353,13 +390,12 @@ export default function ChatPage() {
           <button onClick={() => router.push('/dashboard/settings')} className="w-10 h-10 rounded-xl hover:bg-slate-200/60 flex items-center justify-center text-slate-500 transition-colors" title="Settings">
             <Settings className="w-5 h-5" />
           </button>
-          <div className="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center text-white cursor-pointer shadow-sm" title="Kamal Ilham | Pharmacist">
+          <div className="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center text-white cursor-pointer shadow-sm" title="Profil Pengguna">
             <span className="text-[11px] font-bold">KI</span>
           </div>
         </div>
       </div>
 
-      {/* 🌟 PERBAIKAN MOBILE: BACKDROP GELAP SAAT DRAWER DIBUKA DI HP */}
       <AnimatePresence>
         {isHistoryOpen && (
           <motion.div
@@ -377,7 +413,6 @@ export default function ChatPage() {
             initial={{ width: 0, opacity: 0 }}
             animate={{ width: 280, opacity: 1 }}
             exit={{ width: 0, opacity: 0 }}
-            /* 🌟 PERBAIKAN MOBILE: Menjadi absolute menumpuk (z-50) di HP, tapi tetap sejalan (relative) di Laptop */
             className="fixed md:relative inset-y-0 left-0 bg-[#F9FAFB] border-r border-slate-200 shadow-2xl md:shadow-none flex flex-col shrink-0 z-50 md:z-10 overflow-hidden"
           >
             <div className="w-[280px] h-full flex flex-col">
@@ -388,7 +423,6 @@ export default function ChatPage() {
                 </button>
               </div>
 
-              {/* 🌟 PERBAIKAN MOBILE: Tombol Chat Baru & Pengaturan dimasukkan ke menu HP karena Sidebar disembunyikan */}
               <div className="md:hidden flex gap-2 p-4 border-b border-slate-100">
                 <button onClick={createNewSession} className="flex-1 flex items-center justify-center gap-2 bg-indigo-600 text-white py-2 rounded-xl text-sm font-medium hover:bg-indigo-700 transition-colors">
                   <Plus className="w-4 h-4" /> Chat Baru
@@ -402,10 +436,7 @@ export default function ChatPage() {
                 {sessions.map((session) => (
                   <div 
                     key={session.id}
-                    onClick={() => {
-                      setCurrentSessionId(session.id);
-                      if (window.innerWidth < 768) setIsHistoryOpen(false); // Tutup drawer otomatis di HP
-                    }}
+                    onClick={() => fetchMessagesForSession(session.id)}
                     className={`w-full flex items-center justify-between px-3 py-3 md:py-2.5 rounded-lg cursor-pointer transition-all group text-[13px] ${
                       currentSessionId === session.id ? 'bg-white shadow-sm border border-slate-100 font-medium text-slate-800' : 'hover:bg-slate-200/50 text-slate-600'
                     }`}
@@ -428,25 +459,19 @@ export default function ChatPage() {
         )}
       </AnimatePresence>
 
-      {/* MAIN AREA (OBROLAN) */}
+      {/* MAIN AREA */}
       <div 
         className="flex-1 flex flex-col h-[100dvh] overflow-hidden relative"
         style={{ background: 'linear-gradient(180deg, #F8FBFF 0%, #FFFFFF 100%)' }}
       >
-        
-        {/* KAPSUL HEADER */}
-        {/* 🌟 PERBAIKAN MOBILE: Padding atas dikecilkan (pt-4) dan ditambah tombol Hamburger Menu */}
         <header className="absolute top-0 left-0 w-full pt-4 md:pt-6 px-4 md:px-10 z-30 flex items-start justify-between pointer-events-none">
           <div className="pointer-events-auto flex items-center gap-2">
-            
-            {/* Tombol Hamburger HP */}
             <button
                onClick={() => setIsHistoryOpen(true)}
                className="md:hidden flex items-center justify-center w-10 h-10 bg-white/80 backdrop-blur-md border border-slate-200 rounded-full shadow-sm text-slate-600 hover:text-indigo-600 transition-colors"
              >
                <Menu className="w-5 h-5" />
             </button>
-
             <div className="flex items-center gap-2 text-[13px] md:text-[14px] font-semibold text-slate-700 bg-white/80 px-4 py-2.5 md:px-5 md:py-2.5 rounded-full backdrop-blur-md border border-slate-200/60 shadow-sm">
               <Bot className="w-4 h-4 text-indigo-500 shrink-0" />
               <span className="hidden sm:inline">EIO Health AI</span>
@@ -463,17 +488,12 @@ export default function ChatPage() {
           </button>
         </header>
 
-        {/* MASKER GRADASI MENGGUNAKAN INLINE CSS MUTLAK */}
         <div 
           className="absolute top-0 left-0 w-full h-32 md:h-40 z-20 pointer-events-none"
           style={{ background: 'linear-gradient(180deg, #F8FBFF 45%, rgba(248, 251, 255, 0) 100%)' }}
         />
 
-        {/* AREA CHAT */}
-        {/* 🌟 PERBAIKAN MOBILE: Padding bawah disesuaikan agar tidak tertutup input keyboard */}
         <main className="flex-1 overflow-y-auto w-full pt-24 md:pt-32 pb-36 md:pb-40 px-4 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
-          
-          {/* EMPTY STATE */}
           {messages.length === 0 && (
             <div className="h-full flex flex-col items-center justify-center max-w-[800px] mx-auto w-full">
               <h1 className="text-2xl md:text-3xl font-bold text-slate-800 mb-2 tracking-tight text-center">EIOHealth AI Assistant</h1>
@@ -492,7 +512,6 @@ export default function ChatPage() {
             </div>
           )}
 
-          {/* ACTIVE CHAT AREA */}
           <div className="w-full max-w-[850px] mx-auto flex flex-col gap-5 md:gap-6 relative z-10">
             <AnimatePresence initial={false}>
               {messages.map((msg, idx) => {
@@ -524,21 +543,15 @@ export default function ChatPage() {
                     className="flex w-full"
                   >
                     {isUser ? (
-                      /* BUBBLE USER */
-                      /* 🌟 PERBAIKAN MOBILE: Padding dan Font dikecilkan sedikit */
                         <div className="ml-auto px-4 py-3 md:px-6 md:py-4 bg-slate-900 text-white rounded-[20px] md:rounded-3xl rounded-br-md shadow-sm max-w-[85%] md:max-w-[75%]">
                         <div className="text-[14px] md:text-[15px] font-medium leading-relaxed whitespace-pre-wrap">{msgText}</div>
                       </div>
                     ) : (
-                      /* BUBBLE AI & AVATAR UNGU */
                       <div className="mr-auto flex gap-3 md:gap-4 w-full max-w-[98%] md:max-w-[90%] z-0">
-                        
                         <div className="flex w-8 h-8 md:w-12 md:h-12 rounded-full bg-indigo-600 items-center justify-center shrink-0 mt-1 shadow-md shadow-indigo-500/20">
                           <Sparkles className="w-4 h-4 md:w-6 md:h-6 text-white" />
                         </div>
-                        
                         <div className="flex flex-col items-start gap-1 w-full min-w-0">
-                          
                           <div className="w-full px-4 py-4 md:px-7 md:py-6 bg-white border border-slate-200 rounded-[20px] md:rounded-3xl rounded-tl-md shadow-sm">
                             {isLastMsg && !isProcessing ? (
                               <RevealTypewriter text={msgText} onType={scrollToBottom} />
@@ -548,7 +561,6 @@ export default function ChatPage() {
                               </ReactMarkdown>
                             )}
                           </div>
-                          
                           <div className="flex items-center gap-1 ml-1 mt-1 text-slate-400">
                             <button onClick={() => handleCopy(msgText, msg.id)} className="p-1.5 hover:text-indigo-600 hover:bg-slate-100 rounded-lg transition-colors" title="Salin Teks">
                               {copiedId === msg.id ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
@@ -588,8 +600,6 @@ export default function ChatPage() {
           </div>
         </main>
 
-        {/* CHAT INPUT */}
-        {/* 🌟 PERBAIKAN MOBILE: Padding form disesuaikan agar hemat tempat (pb-safe) */}
         <div className="absolute bottom-0 w-full bg-gradient-to-t from-white via-white/95 to-transparent pt-4 pb-4 md:pt-6 md:pb-8 px-3 md:px-4 pointer-events-none z-30">
           <div className="max-w-[800px] mx-auto w-full pointer-events-auto">
             
@@ -600,7 +610,6 @@ export default function ChatPage() {
               </div>
             )}
 
-            {/* File Preview */}
             {attachments.length > 0 && (
               <div className="flex gap-2 mb-2 overflow-x-auto pb-1 pl-2 md:pl-4 no-scrollbar">
                 {attachments.map((file, idx) => (
@@ -615,7 +624,6 @@ export default function ChatPage() {
               </div>
             )}
 
-            {/* Input Form */}
             <form
               onSubmit={handleSubmit}
               className="relative flex items-end gap-1 bg-white border border-[rgba(0,0,0,0.1)] shadow-[0_4px_20px_rgba(0,0,0,0.04)] rounded-[24px] md:rounded-[32px] px-1 md:px-2 py-1 md:py-1.5 focus-within:border-[rgba(0,0,0,0.2)] transition-all duration-200"
@@ -626,12 +634,11 @@ export default function ChatPage() {
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
-                    // Cukup cek input teks saja, abaikan attachments
-                    if (input.trim() && !isProcessing) handleSubmit(e);
+                    // PERBAIKAN: Izinkan Enter ditekan asalkan ada teks ATAU file
+                    if ((input.trim() || attachments.length > 0) && !isProcessing) handleSubmit(e);
                   }
                 }}
                 placeholder={isListening ? "Mendengarkan..." : "Kirim pesan ke EIOHealth AI..."}
-                // Padding kiri ditambah (px-4) agar teks tidak mepet pinggir setelah ikon dihapus
                 className="flex-1 bg-transparent border-none py-2.5 md:py-3 px-4 text-[14px] md:text-[15px] text-slate-800 placeholder:text-slate-400 focus:outline-none resize-none max-h-[120px] md:max-h-[150px] min-h-[40px] md:min-h-[44px] scrollbar-thin"
                 rows={1}
                 disabled={isProcessing}
@@ -669,7 +676,6 @@ export default function ChatPage() {
             </div>
           </div>
         </div>
-
       </div>
     </div>
   );

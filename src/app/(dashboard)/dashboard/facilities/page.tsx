@@ -263,7 +263,7 @@ export default function FacilitiesPage() {
         {/* Grup Tombol Kanan */}
         <div className="flex items-center gap-2 pointer-events-auto">
           
-          {/* 🌟 TOMBOL DARURAT KHUSUS HP (Sembunyi di Laptop) */}
+          {/*   TOMBOL DARURAT KHUSUS HP (Sembunyi di Laptop) */}
           <button
             onClick={() => setIsEmergencyModalOpen(true)}
             className="md:hidden flex items-center justify-center w-9 h-9 bg-rose-50/90 backdrop-blur-md border border-rose-200 text-rose-600 rounded-full shadow-sm hover:bg-rose-100 transition-all"
@@ -338,7 +338,7 @@ export default function FacilitiesPage() {
         {/* KOLOM KANAN (List & Darurat) */}
         <div className="w-full md:w-[380px] shrink-0 flex flex-col gap-3 md:gap-4 h-auto md:h-full">
           
-          {/* 🌟 KOTAK DARURAT MERAH: Sembunyi di HP (hidden md:block) karena sudah dipindah ke Header */}
+          {/*   KOTAK DARURAT MERAH: Sembunyi di HP (hidden md:block) karena sudah dipindah ke Header */}
           <div className="hidden md:block rounded-[20px] md:rounded-2xl bg-gradient-to-br from-[#E11D48] to-[#BE123C] p-4 md:p-5 text-white shadow-md relative overflow-hidden shrink-0 border border-rose-800">
             <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
             <div className="relative z-10 flex gap-3 md:gap-4 items-center">

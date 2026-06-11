@@ -19,7 +19,7 @@ import {
 
 export default function AdminLayout({ 
   children,
-  currentUser // 🌟 Prop baru untuk menerima data dari database/session
+  currentUser //   Prop baru untuk menerima data dari database/session
 }: { 
   children: React.ReactNode;
   currentUser?: { name: string; isStaff: boolean; role?: string } | null;
@@ -156,7 +156,7 @@ export default function AdminLayout({
           <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:24px_24px]" />
         </div>
 
-        {/* 🌟 AREA FLOAT KANAN ATAS */}
+        {/*   AREA FLOAT KANAN ATAS */}
         <div className="absolute top-6 right-6 md:right-8 z-50 flex flex-col gap-3 items-center">
           
           {/* Lonceng Notifikasi */}
@@ -183,7 +183,7 @@ export default function AdminLayout({
           {children}
         </div>
       </main>
-      {/* 🌟 3. DESAIN POP-UP KONFIRMASI LOGOUT */}
+      {/*   3. DESAIN POP-UP KONFIRMASI LOGOUT */}
       {isLogoutModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/40 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-white rounded-2xl shadow-2xl p-6 w-[90%] max-w-sm animate-in zoom-in-95 duration-300">

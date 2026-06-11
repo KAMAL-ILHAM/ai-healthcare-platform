@@ -35,11 +35,11 @@ export default async function EducationPage() {
     if (!apiKey) {
       console.error("PERINGATAN: NEWS_API_KEY belum diatur di file .env!");
     } else {
-      // 🌟 PERBAIKAN 1: Kata kunci dibuat sangat spesifik untuk Edukasi & Penyakit
+      //   PERBAIKAN 1: Kata kunci dibuat sangat spesifik untuk Edukasi & Penyakit
       const query = 'penyakit OR gejala OR pengobatan OR pencegahan OR "edukasi kesehatan" OR "tips sehat" OR nutrisi';
       const encodedQuery = encodeURIComponent(query); // Mengamankan spasi dan tanda kutip untuk URL
 
-      // 🌟 PERBAIKAN 2: Ubah sortBy menjadi 'relevancy' (Paling Relevan)
+      //   PERBAIKAN 2: Ubah sortBy menjadi 'relevancy' (Paling Relevan)
       const res = await fetch(
         `https://newsapi.org/v2/everything?q=${encodedQuery}&language=id&sortBy=relevancy&apiKey=${apiKey}`,
         { 
@@ -59,7 +59,7 @@ export default async function EducationPage() {
             id: `api-${index}`,
             title: article.title,
             excerpt: article.description || 'Baca selengkapnya mengenai edukasi medis ini langsung di portal aslinya.',
-            category: 'Edukasi Medis', // 🌟 Nama kategorinya kita ubah biar lebih pas
+            category: 'Edukasi Medis', //   Nama kategorinya kita ubah biar lebih pas
             readTime: "Luar",
             likes: Math.floor(Math.random() * 300) + 50,
             author: article.author || article.source?.name || 'Portal Kesehatan',
