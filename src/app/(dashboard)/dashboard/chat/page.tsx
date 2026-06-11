@@ -25,7 +25,7 @@ const quickPrompts = [
   { text: "Analisis Gejala", prompt: "Tolong analisis gejala berikut ini: " },
   { text: "Interaksi Obat", prompt: "Apakah ada interaksi antara obat " },
   { text: "Cari Fasilitas Medis", prompt: "Tolong carikan fasilitas kesehatan terdekat untuk penanganan " },
-  { text: "Upload Resep", prompt: "Berikut lampiran resep medis. Tolong jelaskan indikasinya." },
+  { text: "Pertolongan Pertama", prompt: "Apa langkah pertolongan pertama yang harus dilakukan di rumah jika terjadi " },
   { text: "Edukasi Kesehatan", prompt: "Berikan edukasi kesehatan singkat mengenai " }
 ];
 
