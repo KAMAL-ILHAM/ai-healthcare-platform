@@ -6,7 +6,7 @@ EIO Health adalah platform kesehatan digital komprehensif yang menyediakan layan
 
 ---
 
-## Tim Pengembang (Kelompok 11)
+## Tim Pengembang (Kelompok 15)
 
 | Nama | Peran |
 | --- | --- |
